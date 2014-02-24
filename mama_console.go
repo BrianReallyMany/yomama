@@ -2,6 +2,8 @@ package main
 
 import (
     "fmt"
+    "log"
+    "os/exec"
 )
 
 // The yomama console class
@@ -28,6 +30,14 @@ func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
     switch cmd {
     case "echo":
         fmt.Println(string(line))
+        break
+
+    case "system":
+        out, err := exec.Command(args[0], args[1:]...).Output()
+	    if err != nil {
+		    log.Fatal(err)
+	    }
+        fmt.Print(string(out))
         break
 
     case "exit":
