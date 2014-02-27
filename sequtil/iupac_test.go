@@ -26,9 +26,9 @@ func TestMatchBaseHtoGFalse(t *testing.T) {
 	}
 }
 
-func TestMatchBaseCtoNTrue(t *testing.T) {
-	if (!MatchBase("C", "N")) {
-		t.Errorf("MatchBase('C', 'N') returned false.")
+func TestMatchBaseCtoNFalse(t *testing.T) {
+	if (MatchBase("C", "N")) {
+		t.Errorf("MatchBase('C', 'N') returned true.")
 	}
 }
 

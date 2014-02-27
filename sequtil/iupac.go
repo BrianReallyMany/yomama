@@ -5,11 +5,11 @@ import (
 )
 
 var m = map[string]string{
-	"a": "an",
-	"c": "cn",
-	"g": "gn",
-	"t": "tun",
-	"u": "tun",
+	"a": "a",
+	"c": "c",
+	"g": "g",
+	"t": "tu",
+	"u": "tu",
 	"r": "ag",
 	"y": "ct",
 	"s": "gc",
