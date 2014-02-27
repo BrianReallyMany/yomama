@@ -1,25 +1,25 @@
 package sequtil
 
-func MatchBeginAndEnd(flankseqs [2]string, seq string, mismatchesAllowed int) bool {
+func MatchBeginAndEnd(oligoseqs [2]string, rawseq string, mismatchesAllowed int) bool {
 	// need func to count mismatches between 2 seqs
 	misses := 0
-	frontflank := flankseqs[0]
-	rearflank := flankseqs[1]
-	beginseq := seq[:len(frontflank)]
-	endseq := seq[len(seq) - len(rearflank):]
+	frontoligo := oligoseqs[0]
+	rearoligo := oligoseqs[1]
+	beginraw := rawseq[:len(frontoligo)]
+	endraw := rawseq[len(rawseq) - len(rearoligo):]
 	// Note that it is required to pass the arguments to
 	// NumberMismatches in this order
-	misses += NumberMismatches(frontflank, beginseq)
-	misses += NumberMismatches(rearflank, endseq)
+	misses += NumberMismatches(frontoligo, beginraw)
+	misses += NumberMismatches(rearoligo, endraw)
 	if misses > mismatchesAllowed {
 		return false
 	}
 	return true 	// TODO
 }
 
-func NumberMismatches(utilityseq, rawseq string) int {
+func NumberMismatches(oligoseq, rawseq string) int {
 	count := 0
-	len1 := len(utilityseq)
+	len1 := len(oligoseq)
 	len2 := len(rawseq)
 	shorterLen := len1
 
@@ -36,7 +36,7 @@ func NumberMismatches(utilityseq, rawseq string) int {
 	for i := 0; i < shorterLen; i++ {
 		// Note that it is required to provide the arguments to MatchBase
 		// in this order.
-		if !MatchBase(string(utilityseq[i]), string(rawseq[i])) {
+		if !MatchBase(string(oligoseq[i]), string(rawseq[i])) {
 			count++
 		}
 	}

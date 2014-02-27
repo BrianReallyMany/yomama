@@ -26,40 +26,40 @@ func TestMakeTestMap(t *testing.T) {
 }
 
 func TestMatchBeginAndEndTrue(t *testing.T) {
-	testseq := "GATTACA"
-	testprimers := [2]string{"GAT", "ACA"}
-	match := MatchBeginAndEnd(testprimers, testseq, 0)
+	testraw := "GATTACA"
+	testoligos := [2]string{"GAT", "ACA"}
+	match := MatchBeginAndEnd(testoligos, testraw, 0)
 	expected := true
 	if (match != expected) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 0) = %t, want %t", testprimers, testseq, match, expected)
+		t.Errorf("MatchBeginAndEnd(%s, %s, 0) = %t, want %t", testoligos, testraw, match, expected)
 	}
 }
 
 func TestMatchBeginAndEndFalse(t *testing.T) {
-	testseq := "GATTACA"
-	testprimers := [2]string{"GGG", "GGG"}
-	match := MatchBeginAndEnd(testprimers, testseq, 0)
+	testraw := "GATTACA"
+	testoligos := [2]string{"GGG", "GGG"}
+	match := MatchBeginAndEnd(testoligos, testraw, 0)
 	if (match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 0) returned true.", testprimers, testseq)
+		t.Errorf("MatchBeginAndEnd(%s, %s, 0) returned true.", testoligos, testraw)
 	}
 }
 
 func TestMatchBeginAndEndMistakesAllowedTrue(t *testing.T) {
-	testseq := "GATTACA"
-	testprimers := [2]string{"GAA", "ACA"}
-	match := MatchBeginAndEnd(testprimers, testseq, 1)
+	testraw := "GATTACA"
+	testoligos := [2]string{"GAA", "ACA"}
+	match := MatchBeginAndEnd(testoligos, testraw, 1)
 	if (!match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned false.", testprimers, testseq)
+		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned false.", testoligos, testraw)
 	}
 }
 	
 
 func TestMatchBeginAndEndMistakesAllowedFalse(t *testing.T) {
-	testseq := "GATTACA"
-	testprimers := [2]string{"GCC", "ACA"}
-	match := MatchBeginAndEnd(testprimers, testseq, 1)
+	testraw := "GATTACA"
+	testoligos := [2]string{"GCC", "ACA"}
+	match := MatchBeginAndEnd(testoligos, testraw, 1)
 	if (match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned true.", testprimers, testseq)
+		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned true.", testoligos, testraw)
 	}
 }
 

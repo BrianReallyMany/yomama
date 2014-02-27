@@ -23,9 +23,10 @@ var m = map[string]string{
 	"n": "nacgt",
 }
 
-func MatchBase(base1, base2 string) bool {
-	matches := m[strings.ToLower(base1)]
-	return strings.Contains(matches, strings.ToLower(base2))
+// Assumes specified order for arguments; violators will be prosecuted
+func MatchBase(oligobase, rawbase string) bool {
+	matches := m[strings.ToLower(oligobase)]
+	return strings.Contains(matches, strings.ToLower(rawbase))
 }
 
 
