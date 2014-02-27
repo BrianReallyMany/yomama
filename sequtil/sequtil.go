@@ -1,18 +1,5 @@
 package sequtil
 
-import (
-	"strings"
-)
-
-func FindFlankingSeqs(seq string, flankers [][]string) []string {
-	for _, pair := range flankers {
-		if (strings.HasPrefix(seq, pair[0]) && strings.HasSuffix(seq, pair[1])) {
-			return pair
-		}
-	}
-	return nil
-}
-
 func MatchBeginAndEnd(flankseqs [2]string, seq string, mismatchesAllowed int) bool {
 	// need func to count mismatches between 2 seqs
 	misses := 0
@@ -20,6 +7,8 @@ func MatchBeginAndEnd(flankseqs [2]string, seq string, mismatchesAllowed int) bo
 	rearflank := flankseqs[1]
 	beginseq := seq[:len(frontflank)]
 	endseq := seq[len(seq) - len(rearflank):]
+	// Note that it is required to pass the arguments to
+	// NumberMismatches in this order
 	misses += NumberMismatches(frontflank, beginseq)
 	misses += NumberMismatches(rearflank, endseq)
 	if misses > mismatchesAllowed {
@@ -28,10 +17,10 @@ func MatchBeginAndEnd(flankseqs [2]string, seq string, mismatchesAllowed int) bo
 	return true 	// TODO
 }
 
-func NumberMismatches(seq1, seq2 string) int {
+func NumberMismatches(utilityseq, rawseq string) int {
 	count := 0
-	len1 := len(seq1)
-	len2 := len(seq2)
+	len1 := len(utilityseq)
+	len2 := len(rawseq)
 	shorterLen := len1
 
 	// Penalty for seqs of unequal length
@@ -45,7 +34,9 @@ func NumberMismatches(seq1, seq2 string) int {
 	}
 
 	for i := 0; i < shorterLen; i++ {
-		if !MatchBase(string(seq1[i]), string(seq2[i])) {
+		// Note that it is required to provide the arguments to MatchBase
+		// in this order.
+		if !MatchBase(string(utilityseq[i]), string(rawseq[i])) {
 			count++
 		}
 	}
