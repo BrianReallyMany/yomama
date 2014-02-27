@@ -20,7 +20,7 @@ func RandomJoke() string {
     
     // Choose a joke randomly and return it
     jokes := strings.Split(string(text), "\n")
-    jokenumber := rand.Intn(len(jokes))
+    jokenumber := rand.Intn(len(jokes)-1)
     return jokes[jokenumber]+"\n"
 }
 
