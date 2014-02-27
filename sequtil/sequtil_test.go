@@ -81,6 +81,15 @@ func TestNumberMismatchesZero(t *testing.T) {
 	}
 }
 
+func TestNumberMismatchesOligoStringEmpty(t *testing.T) {
+	oligo := ""
+	raw := "GGG"
+	mismatches := NumberMismatches(oligo, raw)
+	if mismatches != 0 {
+		t.Errorf("NumberMismatches('', 'GGG') returned %s, want 0", mismatches)
+	}
+}
+
 func TestNumberMismatchesUnequalLengths(t *testing.T) {
 	seq1 := "GGGCC"
 	seq2 := "GGA"

@@ -25,6 +25,11 @@ func NumberMismatches(oligoseq, rawseq string) int {
 	len2 := len(rawseq)
 	shorterLen := len1
 
+	// No mismatches if oligo is empty string
+	if len1 == 0 {
+		return 0
+	}
+
 	// Penalty for seqs of unequal length
 	if diff := len1 - len2; diff != 0 {
 		if diff < 0 {
