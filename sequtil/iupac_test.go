@@ -14,9 +14,9 @@ func TestMatchBaseTrivialFalse(t *testing.T) {
 	}
 }
 
-func TestMatchBaseAtoRTrue(t *testing.T) {
-	if (!MatchBase("A", "R")) {
-		t.Errorf("MatchBase('A', 'R') returned false.")
+func TestMatchBaseAtoRFalse(t *testing.T) {
+	if (MatchBase("A", "R")) {
+		t.Errorf("MatchBase('A', 'R') returned true. Shouldn't have 'R' in raw sequence.")
 	}
 }
 

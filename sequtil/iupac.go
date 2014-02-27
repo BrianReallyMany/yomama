@@ -5,22 +5,22 @@ import (
 )
 
 var m = map[string]string{
-	"a": "arwmdhvn",
-	"c": "cysmbhvn",
-	"g": "grskbdvn",
-	"t": "tuywkbdhn",
-	"u": "tuywkbdhn",
-	"r": "rag",
-	"y": "yct",
-	"s": "sgc",
-	"w": "wat",
-	"k": "kgt",
-	"m": "mac",
-	"b": "bcgt",
-	"d": "dagt",
-	"h": "hact",
-	"v": "vacg",
-	"n": "nacgturyswkmbdhv",
+	"a": "an",
+	"c": "cn",
+	"g": "gn",
+	"t": "tun",
+	"u": "tun",
+	"r": "ag",
+	"y": "ct",
+	"s": "gc",
+	"w": "at",
+	"k": "gt",
+	"m": "ac",
+	"b": "cgt",
+	"d": "agt",
+	"h": "act",
+	"v": "acg",
+	"n": "nacgt",
 }
 
 func MatchBase(base1, base2 string) bool {
