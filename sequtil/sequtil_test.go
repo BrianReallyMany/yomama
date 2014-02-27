@@ -89,3 +89,31 @@ func TestNumberMismatchesUnequalLengths(t *testing.T) {
 		t.Errorf("NumberMismatches(%s, %s) returned %d, want 3", seq1, seq2, mismatches)
 	}
 }
+
+func TestReverse(t *testing.T) {
+	if result := Reverse("abc123"); result != "321cba" {
+		t.Errorf("Reverse('abc123') = %s, expected '321cba'", result)
+	}
+}
+
+func TestComplement(t *testing.T) {
+	if result := Complement("ACGT"); result != "TGCA" {
+		t.Errorf("Complement('ACGT') = %s; expected 'TGCA'", result)
+	}
+}
+
+func TestReverseComplementOneBase(t *testing.T) {
+	inseq := "C"
+	outseq := ReverseComplement(inseq)
+	if outseq != "G" {
+		t.Errorf("ReverseComplement('C') returned %s, expected 'G'", outseq)
+	}
+}
+
+func TestReverseComplementSeq(t *testing.T) {
+	inseq := "CAT"
+	outseq := ReverseComplement(inseq)
+	if outseq != "ATG" {
+		t.Errorf("ReverseComplement('CAT') returned %s, expected 'ATG'", outseq)
+	}
+}

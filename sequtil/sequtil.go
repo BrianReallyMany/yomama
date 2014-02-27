@@ -1,5 +1,7 @@
 package sequtil
 
+// TODO instead of take int and return bool, just return # mismatches. We are going
+// to have to run against all barcodes (primers, linkers, etc) and pick the winner.
 func MatchBeginAndEnd(oligoseqs [2]string, rawseq string, mismatchesAllowed int) bool {
 	// need func to count mismatches between 2 seqs
 	misses := 0
@@ -41,4 +43,40 @@ func NumberMismatches(oligoseq, rawseq string) int {
 		}
 	}
 	return count
+}
+
+// Copied from StackOverflow. Very clever.
+func Reverse(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}
+
+func Complement(s string) string {
+	result := make([]rune, len(s))
+	var compdict = map[rune]rune{
+		'A': 'T',
+		'C': 'G',
+		'G': 'C',
+		'T': 'A',
+		'a': 't',
+		'c': 'g',
+		'g': 'c',
+		't': 'a',
+		'N': 'N',
+		'n': 'n',
+	}
+	runes := []rune(s)
+	for i, rune := range runes {
+		result[i] = compdict[rune]
+	}
+	return string(result)
+}
+
+
+func ReverseComplement(seq string) string {
+	reversed := Reverse(seq)
+	return Complement(reversed)
 }
