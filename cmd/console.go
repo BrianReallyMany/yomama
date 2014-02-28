@@ -30,16 +30,19 @@ func DoConsole(c Console) {
         fmt.Print(c.Prompt()) // Output the console prompt
 
         // Grab a line from the console
-        line, lineOverflowed, err := reader.ReadLine()
+        line, err := reader.ReadBytes('\n')
 
         if len(line) == 0 {
             continue        
         }
 
-        // TODO
-        if lineOverflowed || err != nil {
-            fmt.Print("Sorry, there was a problem reading that command\n")
+        if err != nil {
+            fmt.Println("Sorry, there was a problem reading that command")
+            fmt.Println(err)
         }
+
+        // Sanitize the line
+        line = bytes.Trim(line, " \n")
 
         // Separate the line
         lineSep := bytes.Split(line, []byte{' '})
