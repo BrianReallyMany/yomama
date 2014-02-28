@@ -1,2 +1,4 @@
 yomama
 *.go~
+local_files/*
+
