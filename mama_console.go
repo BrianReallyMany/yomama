@@ -4,7 +4,7 @@ import (
     "fmt"
     "log"
     "os/exec"
-    "github.com/BrianReallyMany/yomama/jokes"
+    "github.com/BrianReallyMany/yomama/dozens"
 )
 
 // The yomama console class
@@ -42,7 +42,7 @@ func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
         break
 
     case "yomama":
-        fmt.Print(jokes.RandomJoke())
+        fmt.Print(dozens.RandomDozens())
 
     case "exit":
         return false

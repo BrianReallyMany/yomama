@@ -1,4 +1,4 @@
-package jokes
+package dozens
 
 import (
     "strings"
@@ -8,10 +8,10 @@ import (
     "time"
 )
 
-func RandomJoke() string {
+func RandomDozens() string {
     rand.Seed(time.Now().UnixNano())
-    // Read in jokes file
-    text, err := ioutil.ReadFile("jokes/jokes.data")
+    // Read in dozens file
+    text, err := ioutil.ReadFile("dozens/dozens.data")
     if err != nil {
         fmt.Println(err)
         
@@ -19,8 +19,8 @@ func RandomJoke() string {
     }
     
     // Choose a joke randomly and return it
-    jokes := strings.Split(string(text), "\n")
-    jokenumber := rand.Intn(len(jokes)-1)
-    return jokes[jokenumber]+"\n"
+    dozens := strings.Split(string(text), "\n")
+    dozensnumber := rand.Intn(len(dozens)-1)
+    return dozens[dozensnumber]+"\n"
 }
 
