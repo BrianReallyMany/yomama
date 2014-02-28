@@ -4,7 +4,7 @@ import (
     "bufio"
     "bytes"
     "fmt"
-    "os"
+    "io"
 )
 
 // Interface for consoles
@@ -18,12 +18,12 @@ type Console interface {
 
 // Execute a console implementation
 // TODO: Possibly supply buffer to read from?
-func DoConsole(c Console) {
+func DoConsole(c Console, ioReader io.Reader) {
     // Greet the user
     fmt.Print(c.Greet(), "\n\n")
 
     // Create a buffer for line reading
-    reader := bufio.NewReader(os.Stdin)
+    reader := bufio.NewReader(ioReader)
 
     // Prompt the user until they want to be prompted no more
     for {

@@ -2,6 +2,7 @@ package main
 
 import (
     "github.com/BrianReallyMany/yomama/cmd"
+    "os"
 )
 
 
@@ -9,5 +10,5 @@ import (
 func main() {
     console := MakeMamaConsole()
 
-    cmd.DoConsole(console)
+    cmd.DoConsole(console, os.Stdin)
 }
