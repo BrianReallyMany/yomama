@@ -3,39 +3,85 @@ package sequtil
 import "testing"
 
 func getFakeOligoText() string {
-	result := "GATT\tACA\tlocus1\n"
-	result += "GGGG\tCCCC\tlocus2\n"
-	result += "ACGT\tTGCA\tsample1\n"
-	result += "AAA\tTTT\n"
+	result := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
+	result += "linker\tTCGGCAGCGTCAGAT\tGACTGTGGCAACACC\n"
+	result += "primer\tGTGTAT\tATCAAT\tlocus1\n"
 	return result
 }
 
-// TODO define oligo input file spec. Will have to be more complicated
-// than this. probably "oligo_type\toligo1\toligo2(optional)\tid\n" kine
-// with possibility of only forward linkers, only forward barcodes,
-// only forward primers -- and can have "only forward primers; forward
-// and reverse barcodes" etc., but can't have "some forward primers; some
-// forward and reverse primers". So reading the oligo file
-// tells us whether to try to trim only front or front and back.
-// but ... if we just try to trim front and back, and possibly use an
-// empty string ... no, won't work the way it's written now. hrmph...
-func TestOligoTextToMap(t *testing.T) {
+func getInvalidOligosText() string {
+	result := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
+	result += "linker\tTCGGCAGCGTCAGAT\tGACTGTGGCAACACC\n"
+	result += "primer\tGTGTAT\tATCAAT\t\n"	//missing primer id value
+	return result
+}
+func TestOligoTextToMapsAndLinkerSlice(t *testing.T) {
 	text := getFakeOligoText()
-	resultmap := OligoTextToMap(text)
-	mapinput := [2]string{"GGGG", "CCCC"}
-	mapoutput := resultmap[mapinput]
-	if (mapoutput != "locus2") {
-		t.Errorf("OligoTextToMap returned a map with m[%s] = %s, wanted 'locus2'", mapinput, mapoutput)
+	primerMap, barcodeMap, linkers := OligoTextToMapsAndLinkerSlice(text)
+	primerinput := [2]string{"GTGTAT", "ATCAAT"}
+	primeroutput := primerMap[primerinput]
+
+	if (primeroutput != "locus1") {
+		t.Errorf("OligoTextToMap returned a primerMap with m[%s] = %s, wanted 'locus1'", primerinput, primeroutput)
+	}
+	barcodeinput := [2]string{"ATCGTACGTC", "TAGAATAAAC"}
+	barcodeoutput := barcodeMap[barcodeinput]
+	if (barcodeoutput != "sample1") {
+		t.Errorf("OligoTextToMap returned a barcodeMap with m[%s] = %s, wanted 'sample1'", barcodeinput, barcodeoutput)
+	}
+	linkerinput := [2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}
+	linkeroutput := linkers[0]
+	if (linkerinput != linkeroutput) {
+		t.Errorf("OligoTextToMap returned linkers with [0] = %s, wanted '%s'", linkeroutput, linkerinput)
 	}
 }
 
-func TestOligoTextToMapLinkerEntry(t *testing.T) {
+func TestValidateOligosTextTrue(t *testing.T) {
 	text := getFakeOligoText()
-	resultmap := OligoTextToMap(text)
-	mapinput := [2]string{"AAA", "TTT"}
-	mapoutput := resultmap[mapinput]
-	if (mapoutput != "") {
-		t.Errorf("OligoTextToMap returned a map with m[%s] = %s, wanted empty string", mapinput, mapoutput)
+	if _, ok := ValidateOligosText(text); !ok {
+		t.Errorf("ValidateOligosText failed on valid text:\n%s", text)
 	}
 }
+
+func TestValidateOligosTextFalse(t *testing.T) {
+	text := getInvalidOligosText()
+	if _, ok := ValidateOligosText(text); ok {
+		t.Errorf("ValidateOligosText returned 'ok' on bad input:\n%s", text)
+	}
+}
+
+
+func TestValidateOligosTextNumberOfLinkers(t *testing.T) {
+	text := getFakeOligoText()
+	if numLinkers, _ := ValidateOligosText(text); numLinkers != 1 {
+		t.Errorf("ValidateOligosText returned numLinkers = %d, expected 1", numLinkers)
+	}
+}
+
+func TestValidateOligoLine(t *testing.T) {
+	line := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
+	oligotype := ValidateOligoLine(line)
+	if (oligotype != "barcode") {
+		t.Errorf("ValidateOligoLine returned type=%s; wanted 'barcode'", oligotype)
+	}
+}
+
+func TestValidateOligoBadLine(t *testing.T) {
+	line := "acme_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
+	oligotype := ValidateOligoLine(line)
+	if oligotype != "" {
+		t.Errorf("ValidateOligoLine returned type=%s; expected empty string for invalid input", oligotype)
+	}
+}
+
+
+//func TestOligoTextToMapLinkerEntry(t *testing.T) {
+//	text := getFakeOligoText()
+//	resultmap := OligoTextToMap(text)
+//	mapinput := [2]string{"AAA", "TTT"}
+//	mapoutput := resultmap[mapinput]
+//	if (mapoutput != "") {
+//		t.Errorf("OligoTextToMap returned a map with m[%s] = %s, wanted empty string", mapinput, mapoutput)
+//	}
+//}
 
