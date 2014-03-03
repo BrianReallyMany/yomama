@@ -21,7 +21,7 @@ type FastaReader struct {
 func NewFastaReader(reader *bufio.Reader) *FastaReader {
     f := &FastaReader{}
     f.reader = reader
-    
+
     return f
 }
 
