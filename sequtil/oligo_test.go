@@ -1,6 +1,9 @@
 package sequtil
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func getFakeOligoText() string {
 	result := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
@@ -45,6 +48,7 @@ func TestValidateOligosTextTrue(t *testing.T) {
 
 func TestValidateOligosTextFalse(t *testing.T) {
 	text := getInvalidOligosText()
+	fmt.Printf("Unit test should print error message: ")
 	if _, ok := ValidateOligosText(text); ok {
 		t.Errorf("ValidateOligosText returned 'ok' on bad input:\n%s", text)
 	}
@@ -68,20 +72,9 @@ func TestValidateOligoLine(t *testing.T) {
 
 func TestValidateOligoBadLine(t *testing.T) {
 	line := "acme_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
+	fmt.Printf("Unit test should print error message: ")
 	oligotype := ValidateOligoLine(line)
 	if oligotype != "" {
 		t.Errorf("ValidateOligoLine returned type=%s; expected empty string for invalid input", oligotype)
 	}
 }
-
-
-//func TestOligoTextToMapLinkerEntry(t *testing.T) {
-//	text := getFakeOligoText()
-//	resultmap := OligoTextToMap(text)
-//	mapinput := [2]string{"AAA", "TTT"}
-//	mapoutput := resultmap[mapinput]
-//	if (mapoutput != "") {
-//		t.Errorf("OligoTextToMap returned a map with m[%s] = %s, wanted empty string", mapinput, mapoutput)
-//	}
-//}
-
