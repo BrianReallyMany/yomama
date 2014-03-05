@@ -41,7 +41,7 @@ func TestOligoTextToSeqSorter(t *testing.T) {
 
 func TestValidateOligosTextTrue(t *testing.T) {
 	text := getFakeOligoText()
-	if _, ok := ValidateOligosText(text); !ok {
+	if ok := ValidateOligosText(text); !ok {
 		t.Errorf("ValidateOligosText failed on valid text:\n%s", text)
 	}
 }
@@ -49,32 +49,31 @@ func TestValidateOligosTextTrue(t *testing.T) {
 func TestValidateOligosTextFalse(t *testing.T) {
 	text := getInvalidOligosText()
 	fmt.Printf("Unit test should print error message: ")
-	if _, ok := ValidateOligosText(text); ok {
+	if ok := ValidateOligosText(text); ok {
 		t.Errorf("ValidateOligosText returned 'ok' on bad input:\n%s", text)
 	}
 }
 
-
-func TestValidateOligosTextNumberOfLinkers(t *testing.T) {
+func TestCountLinkers(t *testing.T) {
 	text := getFakeOligoText()
-	if numLinkers, _ := ValidateOligosText(text); numLinkers != 1 {
+	if numLinkers := CountLinkers(text); numLinkers != 1 {
 		t.Errorf("ValidateOligosText returned numLinkers = %d, expected 1", numLinkers)
 	}
 }
 
-func TestValidateOligoLine(t *testing.T) {
+func TestValidateOligoLineGoodLine(t *testing.T) {
 	line := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
-	oligotype := ValidateOligoLine(line)
-	if (oligotype != "barcode") {
-		t.Errorf("ValidateOligoLine returned type=%s; wanted 'barcode'", oligotype)
+	ok := ValidateOligoLine(line)
+	if !ok {
+		t.Errorf("ValidateOligoLine returned not ok; wanted ok")
 	}
 }
 
 func TestValidateOligoBadLine(t *testing.T) {
 	line := "acme_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
 	fmt.Printf("Unit test should print error message: ")
-	oligotype := ValidateOligoLine(line)
-	if oligotype != "" {
-		t.Errorf("ValidateOligoLine returned type=%s; expected empty string for invalid input", oligotype)
+	ok := ValidateOligoLine(line)
+	if ok {
+		t.Errorf("ValidateOligoLine returned ok; expected not ok")
 	}
 }

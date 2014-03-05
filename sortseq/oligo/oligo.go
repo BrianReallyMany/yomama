@@ -27,18 +27,19 @@ func OligoTextToSeqSorter(input string) (SeqSorter, error) {
 	lines := strings.Split(input, "\n")
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)
-	numLinkers, ok := ValidateOligosText(input)
+	ok := ValidateOligosText(input)
 	if !ok {
 		fmt.Println("Failed to validate oligo file\n")
 		return SeqSorter{}, nil
 	}
+	numLinkers := CountLinkers(input)
 	linkers := make([][2]string, numLinkers)
 	linkerCount := 0
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
-		oligotype := ValidateOligoLine(line)
+		oligotype := OligoType(line)
 		fields := strings.Split(line, "\t")
 		switch oligotype {
 		case "":
@@ -61,45 +62,60 @@ func OligoTextToSeqSorter(input string) (SeqSorter, error) {
 }
 
 // Returns number of linker lines and whether the file is valid
-func ValidateOligosText(input string) (int, bool) {
+func ValidateOligosText(input string) bool {
 	lines := strings.Split(input, "\n")
-	numLinkers := 0
 	for i, line := range lines {
 		if line != "" {
-			oligoType := ValidateOligoLine(line)
-			if oligoType == "" {
+			ok := ValidateOligoLine(line)
+			if !ok {
 				fmt.Printf("Oligo file is invalid -- problem at line %d\n", i)
-				return -1, false
-			} else if oligoType == "linker" {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func CountLinkers(input string) int {
+	lines := strings.Split(input, "\n")
+	numLinkers := 0
+	for _, line := range lines {
+		if line != "" {
+			oligoType := OligoType(line)
+			if oligoType == "linker" {
 				numLinkers++
 			}
 		}
 	}
-	return numLinkers, true
+	return numLinkers
 }
 
 // Returns oligo type if line is valid, empty string if not
-func ValidateOligoLine(line string) string {
+func ValidateOligoLine(line string) bool {
 	fields := strings.Split(line, "\t")
 	switch oligotype := fields[0]; oligotype {
 	case "barcode":
 		if (len(fields) != 4 || fields[1] == "" || fields[3] == "") {
-			return ""
+			return false
 		}
-		return oligotype
+		return true
 	case "primer":
 		if (len(fields) != 4 || fields[1] == "" || fields[3] == "") {
-			return ""
+			return false
 		}
-		return oligotype
+		return true
 	case "linker":
 		if len(fields) < 2 {
-			return ""
+			return false
 		}
-		return oligotype
+		return true
 	default:
 		fmt.Printf("Unkown oligo type encountered: %s\n", oligotype)
 	}
-	return ""
+	return false
 }
 
+func OligoType(line string) string {
+	fields := strings.Split(line, "\t")
+	return fields[0]
+}
