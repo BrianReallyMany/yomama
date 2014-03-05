@@ -12,13 +12,14 @@ func getFakeOligoText() string {
 	return result
 }
 
-func getInvalidOligosText() string {
+func getInvalidOligoText() string {
 	result := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
 	result += "linker\tTCGGCAGCGTCAGAT\tGACTGTGGCAACACC\n"
 	result += "primer\tGTGTAT\tATCAAT\t\n"	//missing primer id value
 	return result
 }
-func TestOligoTextToSeqSorter(t *testing.T) {
+
+func TestOligoTextToSeqSorterValidInput(t *testing.T) {
 	text := getFakeOligoText()
 	sorter, _ := OligoTextToSeqSorter(text)
 	primerinput := [2]string{"GTGTAT", "ATCAAT"}
@@ -39,25 +40,32 @@ func TestOligoTextToSeqSorter(t *testing.T) {
 	}
 }
 
-func TestValidateOligosTextTrue(t *testing.T) {
-	text := getFakeOligoText()
-	if ok := ValidateOligosText(text); !ok {
-		t.Errorf("ValidateOligosText failed on valid text:\n%s", text)
+func TestOligoTextToSeqSorterInvalidInput(t *testing.T) {
+	text := getInvalidOligoText()
+	_, err := OligoTextToSeqSorter(text)
+	if err == nil {
+		t.Errorf("OligoTextToSeqSorter failed to return error on invalid input, expected error.")
 	}
 }
 
-func TestValidateOligosTextFalse(t *testing.T) {
-	text := getInvalidOligosText()
-	fmt.Printf("Unit test should print error message: ")
-	if ok := ValidateOligosText(text); ok {
-		t.Errorf("ValidateOligosText returned 'ok' on bad input:\n%s", text)
+func TestValidateOligoTextTrue(t *testing.T) {
+	text := getFakeOligoText()
+	if ok := ValidateOligoText(text); !ok {
+		t.Errorf("ValidateOligoText failed on valid text:\n%s", text)
+	}
+}
+
+func TestValidateOligoTextFalse(t *testing.T) {
+	text := getInvalidOligoText()
+	if ok := ValidateOligoText(text); ok {
+		t.Errorf("ValidateOligoText returned 'ok' on bad input:\n%s", text)
 	}
 }
 
 func TestCountLinkers(t *testing.T) {
 	text := getFakeOligoText()
 	if numLinkers := CountLinkers(text); numLinkers != 1 {
-		t.Errorf("ValidateOligosText returned numLinkers = %d, expected 1", numLinkers)
+		t.Errorf("ValidateOligoText returned numLinkers = %d, expected 1", numLinkers)
 	}
 }
 
@@ -70,7 +78,7 @@ func TestValidateOligoLineGoodLine(t *testing.T) {
 }
 
 func TestValidateOligoBadLine(t *testing.T) {
-	line := "acme_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
+	line := "very_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
 	fmt.Printf("Unit test should print error message: ")
 	ok := ValidateOligoLine(line)
 	if ok {
