@@ -31,7 +31,7 @@ func ReadOligoFile(filename string) string {
     return string(text)
 }
 
-func OligoTextToSeqSorter(input string) (SeqSorter, error) {
+func NewSeqSorter(input string) (SeqSorter, error) {
 	lines := strings.Split(input, "\n")
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)

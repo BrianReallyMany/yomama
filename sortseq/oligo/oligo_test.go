@@ -19,9 +19,9 @@ func getInvalidOligoText() string {
 	return result
 }
 
-func TestOligoTextToSeqSorterValidInput(t *testing.T) {
+func TestNewSeqSorterValidInput(t *testing.T) {
 	text := getFakeOligoText()
-	sorter, _ := OligoTextToSeqSorter(text)
+	sorter, _ := NewSeqSorter(text)
 	primerinput := [2]string{"GTGTAT", "ATCAAT"}
 	primeroutput := sorter.primerMap[primerinput]
 
@@ -40,11 +40,11 @@ func TestOligoTextToSeqSorterValidInput(t *testing.T) {
 	}
 }
 
-func TestOligoTextToSeqSorterInvalidInput(t *testing.T) {
+func TestNewSeqSorterInvalidInput(t *testing.T) {
 	text := getInvalidOligoText()
-	_, err := OligoTextToSeqSorter(text)
+	_, err := NewSeqSorter(text)
 	if err == nil {
-		t.Errorf("OligoTextToSeqSorter failed to return error on invalid input, expected error.")
+		t.Errorf("NewSeqSorter failed to return error on invalid input, expected error.")
 	}
 }
 
@@ -79,7 +79,7 @@ func TestValidateOligoLineGoodLine(t *testing.T) {
 
 func TestValidateOligoBadLine(t *testing.T) {
 	line := "very_oligo_much_sequence\tGATTACA\tGATTACA\tmany_sample\n"
-	fmt.Printf("Unit test should print error message: ")
+	fmt.Printf("(Unit test should print error message:) ")
 	ok := ValidateOligoLine(line)
 	if ok {
 		t.Errorf("ValidateOligoLine returned ok; expected not ok")
