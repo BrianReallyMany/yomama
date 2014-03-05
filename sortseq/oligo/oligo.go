@@ -14,12 +14,6 @@ func (e *OligoError) Error() string {
 	return fmt.Sprintf("oligo problem was %s", e.Problem)
 }
 
-type SeqSorter struct {
-	primerMap map[[2]string]string
-	barcodeMap map[[2]string]string
-	linkers [][2]string
-}
-
 func ReadOligoFile(filename string) string {
     text, err := ioutil.ReadFile(filename)
     if err != nil {
@@ -30,44 +24,6 @@ func ReadOligoFile(filename string) string {
     return string(text)
 }
 
-func NewSeqSorter(input string) (*SeqSorter, error) {
-	lines := strings.Split(input, "\n")
-	primerMap := make(map[[2]string]string)
-	barcodeMap := make(map[[2]string]string)
-	ok := ValidateOligoText(input)
-	if !ok {
-		return &SeqSorter{}, &OligoError{"Failed to validate oligo file\n"}
-	}
-	numLinkers := CountLinkers(input)
-	linkers := make([][2]string, numLinkers)
-	linkerCount := 0
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-		oligotype := OligoType(line)
-		fields := strings.Split(line, "\t")
-		switch oligotype {
-		case "":
-			continue
-		case "barcode":
-			oligoSeqs := [2]string{fields[1], fields[2]}
-			oligoID := fields[3]
-			barcodeMap[oligoSeqs] = oligoID
-		case "primer":
-			oligoSeqs := [2]string{fields[1], fields[2]}
-			oligoID := fields[3]
-			primerMap[oligoSeqs] = oligoID
-		case "linker":
-			linkers[linkerCount] = [2]string{fields[1], fields[2]}
-			linkerCount++
-		}
-	}
-	sorter := &SeqSorter{primerMap, barcodeMap, linkers}
-	return sorter, nil
-}
-
-// Returns number of linker lines and whether the file is valid
 func ValidateOligoText(input string) bool {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
@@ -95,7 +51,6 @@ func CountLinkers(input string) int {
 	return numLinkers
 }
 
-// Returns oligo type if line is valid, empty string if not
 func ValidateOligoLine(line string) bool {
 	fields := strings.Split(line, "\t")
 	switch oligotype := fields[0]; oligotype {
