@@ -6,12 +6,6 @@ import (
     	"io/ioutil"
 )
 
-type SeqSorter struct {
-	primerMap map[[2]string]string
-	barcodeMap map[[2]string]string
-	linkers [][2]string
-}
-
 type OligoError struct {
 	Problem string
 }
@@ -20,6 +14,11 @@ func (e *OligoError) Error() string {
 	return fmt.Sprintf("oligo problem was %s", e.Problem)
 }
 
+type SeqSorter struct {
+	primerMap map[[2]string]string
+	barcodeMap map[[2]string]string
+	linkers [][2]string
+}
 
 func ReadOligoFile(filename string) string {
     text, err := ioutil.ReadFile(filename)
@@ -31,13 +30,13 @@ func ReadOligoFile(filename string) string {
     return string(text)
 }
 
-func NewSeqSorter(input string) (SeqSorter, error) {
+func NewSeqSorter(input string) (*SeqSorter, error) {
 	lines := strings.Split(input, "\n")
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)
 	ok := ValidateOligoText(input)
 	if !ok {
-		return SeqSorter{}, &OligoError{"Failed to validate oligo file\n"}
+		return &SeqSorter{}, &OligoError{"Failed to validate oligo file\n"}
 	}
 	numLinkers := CountLinkers(input)
 	linkers := make([][2]string, numLinkers)
@@ -64,7 +63,7 @@ func NewSeqSorter(input string) (SeqSorter, error) {
 			linkerCount++
 		}
 	}
-	sorter := SeqSorter{primerMap, barcodeMap, linkers}
+	sorter := &SeqSorter{primerMap, barcodeMap, linkers}
 	return sorter, nil
 }
 
@@ -125,3 +124,4 @@ func OligoType(line string) string {
 	fields := strings.Split(line, "\t")
 	return fields[0]
 }
+
