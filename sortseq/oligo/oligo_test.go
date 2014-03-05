@@ -18,22 +18,22 @@ func getInvalidOligosText() string {
 	result += "primer\tGTGTAT\tATCAAT\t\n"	//missing primer id value
 	return result
 }
-func TestOligoTextToMapsAndLinkerSlice(t *testing.T) {
+func TestOligoTextToSeqSorter(t *testing.T) {
 	text := getFakeOligoText()
-	primerMap, barcodeMap, linkers := OligoTextToMapsAndLinkerSlice(text)
+	sorter, _ := OligoTextToSeqSorter(text)
 	primerinput := [2]string{"GTGTAT", "ATCAAT"}
-	primeroutput := primerMap[primerinput]
+	primeroutput := sorter.primerMap[primerinput]
 
 	if (primeroutput != "locus1") {
 		t.Errorf("OligoTextToMap returned a primerMap with m[%s] = %s, wanted 'locus1'", primerinput, primeroutput)
 	}
 	barcodeinput := [2]string{"ATCGTACGTC", "TAGAATAAAC"}
-	barcodeoutput := barcodeMap[barcodeinput]
+	barcodeoutput := sorter.barcodeMap[barcodeinput]
 	if (barcodeoutput != "sample1") {
 		t.Errorf("OligoTextToMap returned a barcodeMap with m[%s] = %s, wanted 'sample1'", barcodeinput, barcodeoutput)
 	}
 	linkerinput := [2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}
-	linkeroutput := linkers[0]
+	linkeroutput := sorter.linkers[0]
 	if (linkerinput != linkeroutput) {
 		t.Errorf("OligoTextToMap returned linkers with [0] = %s, wanted '%s'", linkeroutput, linkerinput)
 	}
