@@ -2,6 +2,7 @@ package sortseq
 
 import (
 	"testing"
+	. "github.com/BrianReallyMany/yomama/seq"
 )
 
 func getFakeOligoText() string {
@@ -16,6 +17,17 @@ func getInvalidOligoText() string {
 	result += "linker\tTCGGCAGCGTCAGAT\tGACTGTGGCAACACC\n"
 	result += "primer\tGTGTAT\tATCAAT\t\n"	//missing primer id value
 	return result
+}
+
+func getSeqSorter() SeqSorter{
+	var priMap = map[[2]string]string{
+		[2]string{"GTGTAT", "ATCAAT"}: "locus1",
+	}
+	var barMap = map[[2]string]string{
+		[2]string{"ATCGTACGTC", "TAGAATAAAC"}: "sample1",
+	}
+	var links = [][2]string{[2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}}
+	return SeqSorter{priMap, barMap, links}
 }
 
 func TestNewSeqSorterValidInput(t *testing.T) {
@@ -44,5 +56,17 @@ func TestNewSeqSorterInvalidInput(t *testing.T) {
 	_, err := NewSeqSorter(text)
 	if err == nil {
 		t.Errorf("NewSeqSorter failed to return error on invalid input, expected error.")
+	}
+}
+
+func TestSortSeq(t *testing.T) {
+	sorter := getSeqSorter()
+	seq := Seq{"foo_seq", "ATCGTACGTCTCGGCAGCGTCAGATGTGTATgattacaATTGATGGTGTTGCCACAGTCGTTTATTCTA", "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40"}
+	if sorter.barcodeMap[[2]string{"ATCGTACGTC", "TAGAATAAAC"}] != "sample1" {
+		t.Errorf("foo error.")
+	}
+	sorted := sorter.SortSeq(&seq)
+	if bases := sorted.seq.Bases; bases != "gattaca" {
+		t.Errorf("SortSeq returned a SortedSeq with bases = %s; expected 'gattaca'", bases)
 	}
 }

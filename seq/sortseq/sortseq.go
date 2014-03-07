@@ -2,8 +2,15 @@ package sortseq
 
 import (
     	"strings"
-	"github.com/BrianReallyMany/yomama/sortseq/oligo"
+	. "github.com/BrianReallyMany/yomama/seq"
+	"github.com/BrianReallyMany/yomama/seq/oligo"
 )
+
+type SortedSeq struct {
+	seq *Seq
+	locus string
+	sample string
+}
 
 type SeqSorter struct {
 	primerMap map[[2]string]string
@@ -48,3 +55,8 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	return sorter, nil
 }
 
+func (s *SeqSorter) SortSeq(seq *Seq) SortedSeq {
+	// TODO
+	seq.Bases = "gattaca"
+	return SortedSeq{seq,"", ""}
+}
