@@ -48,18 +48,18 @@ func (s *Store) AddSeq(seq SortedSeq) error {
     defer file.Close()
 
     // Make sure the key exists, make its section if it doesn't
-    _, keyExists := s.seqIndex[seq.Key]
+    _, keyExists := s.seqIndex[seq.SortKey]
     if !keyExists {
-        s.seqIndex[seq.Key] = make([]storeEntry, 0, 1)
+        s.seqIndex[seq.SortKey] = make([]storeEntry, 0, 1)
     }
 
     // Split data into fixed-width strings
     headerLines := splitFixedWidth([]byte(seq.Header), StoreLineWidth)
     basesLines := splitFixedWidth([]byte(seq.Bases), StoreLineWidth)
-    qualLines := splitFixedWidth([]byte(seq.Qual), StoreLineWidth)
+    qualLines := splitFixedWidth([]byte(seq.Scores), StoreLineWidth)
 
     // Add the store entry
-    s.seqIndex[seq.Key] = append(s.seqIndex[seq.Key], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
+    s.seqIndex[seq.SortKey] = append(s.seqIndex[seq.SortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
 
     // Write to the store file
     file.Seek(0, 2) // Go to the end of the file

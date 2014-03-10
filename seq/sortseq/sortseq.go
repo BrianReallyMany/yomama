@@ -6,12 +6,6 @@ import (
 	"github.com/BrianReallyMany/yomama/seq/oligo"
 )
 
-type SortedSeq struct {
-	seq Seq
-	locus string
-	sample string
-}
-
 type SeqSorter struct {
 	primerMap map[[2]string]string
 	barcodeMap map[[2]string]string
@@ -56,5 +50,5 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
 	// TODO
 	seq.Bases = "gattaca"
-	return SortedSeq{seq,"", ""}
+	return SortedSeq{seq, SortKey{}}
 }

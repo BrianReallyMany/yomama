@@ -66,7 +66,7 @@ func TestSortSeq(t *testing.T) {
 		t.Errorf("foo error.")
 	}
 	sorted := sorter.SortSeq(seq)
-	if bases := sorted.seq.Bases; bases != "gattaca" {
+	if bases := sorted.Bases; bases != "gattaca" {
 		t.Errorf("SortSeq returned a SortedSeq with bases = %s; expected 'gattaca'", bases)
 	}
 }

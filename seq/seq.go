@@ -2,6 +2,6 @@ package seq
 
 type Seq struct {
 	Header string
-	Bases string
+	Bases  string
 	Scores string
 }
