@@ -7,7 +7,7 @@ import (
 )
 
 type SortedSeq struct {
-	seq *Seq
+	seq Seq
 	locus string
 	sample string
 }
@@ -55,7 +55,7 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	return sorter, nil
 }
 
-func (s *SeqSorter) SortSeq(seq *Seq) SortedSeq {
+func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
 	// TODO
 	seq.Bases = "gattaca"
 	return SortedSeq{seq,"", ""}

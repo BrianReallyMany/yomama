@@ -65,7 +65,7 @@ func TestSortSeq(t *testing.T) {
 	if sorter.barcodeMap[[2]string{"ATCGTACGTC", "TAGAATAAAC"}] != "sample1" {
 		t.Errorf("foo error.")
 	}
-	sorted := sorter.SortSeq(&seq)
+	sorted := sorter.SortSeq(seq)
 	if bases := sorted.seq.Bases; bases != "gattaca" {
 		t.Errorf("SortSeq returned a SortedSeq with bases = %s; expected 'gattaca'", bases)
 	}
