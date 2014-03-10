@@ -1,7 +1,6 @@
 package sortseq
 
 import (
-    "errors"
     "math"
     "os"
 )
@@ -20,21 +19,22 @@ type storeEntry struct {
 type Store struct {
     fileName string
 
-    seqIndex  map[SortKey]storeEntry // Map sort keys to store entries
+    seqIndex  map[SortKey][]storeEntry // Map sort keys to store entries
     lineCount uint                   // Line count of the storage file
 }
 
 func NewStore(fileName string) (*Store, error) {
     // Make sure the provided file exists. Create it if it doesn't.
-    _, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
     if err != nil {
         return nil, err
     }
+    defer file.Close()
 
     s := &Store{}
 
     s.fileName = fileName
-    s.seqIndex = make(map[SortKey]storeEntry)
+    s.seqIndex = make(map[SortKey][]storeEntry)
 
     return s, nil
 }
@@ -45,11 +45,12 @@ func (s *Store) AddSeq(seq SortedSeq) error {
     if err != nil {
         return err
     }
+    defer file.Close()
 
-    // Make sure the key is unique
+    // Make sure the key exists, make its section if it doesn't
     _, keyExists := s.seqIndex[seq.Key]
-    if keyExists {
-        return errors.New("Seq with key already exists")
+    if !keyExists {
+        s.seqIndex[seq.Key] = make([]storeEntry, 0, 1)
     }
 
     // Split data into fixed-width strings
@@ -57,8 +58,8 @@ func (s *Store) AddSeq(seq SortedSeq) error {
     basesLines := splitFixedWidth([]byte(seq.Bases), StoreLineWidth)
     qualLines := splitFixedWidth([]byte(seq.Qual), StoreLineWidth)
 
-    // Create the store entry
-    s.seqIndex[seq.Key] = storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))}
+    // Add the store entry
+    s.seqIndex[seq.Key] = append(s.seqIndex[seq.Key], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
 
     // Write to the store file
     file.Seek(0, 2) // Go to the end of the file
