@@ -28,7 +28,6 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	}
 	numLinkers := oligo.CountLinkers(input)
 	linkers := make([][2]string, numLinkers)
-	linkerCount := 0
 	for _, line := range lines {
 		if line == "" {
 			continue
@@ -47,8 +46,7 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 			oligoID := fields[3]
 			primerMap[oligoSeqs] = oligoID
 		case "linker":
-			linkers[linkerCount] = [2]string{fields[1], fields[2]}
-			linkerCount++
+			linkers[len(linkers)-1] = [2]string{fields[1], fields[2]}
 		}
 	}
 	sorter := &SeqSorter{primerMap, barcodeMap, linkers}
