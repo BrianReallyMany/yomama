@@ -48,7 +48,20 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 }
 
 func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
-	// TODO
+	// Find barcode pair with best match
+	// get sample name
+	// trim barcodes off seq bases and qual scores
+
+	// Find linker pair with best match
+	// trim linkers off seq bases and qual scores
+
+	// Find primer pair with best match
+	// get sample name
+	// trim primers off seq bases and qual scores
+
+	// Make SortKey
+	// Make SortedSeq
+	// Return it.
 	seq.Bases = "gattaca"
 	return SortedSeq{seq, SortKey{}}
 }
