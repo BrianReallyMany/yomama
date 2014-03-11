@@ -27,39 +27,11 @@ func TestMakeTestMap(t *testing.T) {
 
 func TestMatchBeginAndEndTrue(t *testing.T) {
 	testraw := "GATTACA"
-	testoligos := [2]string{"GAT", "ACA"}
-	match := MatchBeginAndEnd(testoligos, testraw, 0)
-	expected := true
-	if (match != expected) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 0) = %t, want %t", testoligos, testraw, match, expected)
-	}
-}
-
-func TestMatchBeginAndEndFalse(t *testing.T) {
-	testraw := "GATTACA"
-	testoligos := [2]string{"GGG", "GGG"}
-	match := MatchBeginAndEnd(testoligos, testraw, 0)
-	if (match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 0) returned true.", testoligos, testraw)
-	}
-}
-
-func TestMatchBeginAndEndMistakesAllowedTrue(t *testing.T) {
-	testraw := "GATTACA"
-	testoligos := [2]string{"GAA", "ACA"}
-	match := MatchBeginAndEnd(testoligos, testraw, 1)
-	if (!match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned false.", testoligos, testraw)
-	}
-}
-	
-
-func TestMatchBeginAndEndMistakesAllowedFalse(t *testing.T) {
-	testraw := "GATTACA"
-	testoligos := [2]string{"GCC", "ACA"}
-	match := MatchBeginAndEnd(testoligos, testraw, 1)
-	if (match) {
-		t.Errorf("MatchBeginAndEnd(%s, %s, 1) returned true.", testoligos, testraw)
+	testoligos := [2]string{"GAT", "TGT"}
+	mismatches := MatchBeginAndEnd(testoligos, testraw)
+	expected := 0
+	if (mismatches != expected) {
+		t.Errorf("MatchBeginAndEnd(%s, %s) = %d, want %d", testoligos, testraw, mismatches, expected)
 	}
 }
 

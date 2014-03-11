@@ -1,22 +1,18 @@
 package sequtil
 
-// TODO instead of take int and return bool, just return # mismatches. We are going
-// to have to run against all barcodes (primers, linkers, etc) and pick the winner.
-func MatchBeginAndEnd(oligoseqs [2]string, rawseq string, mismatchesAllowed int) bool {
-	// need func to count mismatches between 2 seqs
+// Returns the number of mismatches between an oligo pair and a raw sequence
+// Second oligo string is reverse complemented before comparison
+func MatchBeginAndEnd(oligoseqs [2]string, rawseq string) int {
 	misses := 0
 	frontoligo := oligoseqs[0]
-	rearoligo := oligoseqs[1]
+	rearoligo := ReverseComplement(oligoseqs[1])
 	beginraw := rawseq[:len(frontoligo)]
 	endraw := rawseq[len(rawseq) - len(rearoligo):]
 	// Note that it is required to pass the arguments to
 	// NumberMismatches in this order
 	misses += NumberMismatches(frontoligo, beginraw)
 	misses += NumberMismatches(rearoligo, endraw)
-	if misses > mismatchesAllowed {
-		return false
-	}
-	return true 	// TODO
+	return misses
 }
 
 func NumberMismatches(oligoseq, rawseq string) int {
