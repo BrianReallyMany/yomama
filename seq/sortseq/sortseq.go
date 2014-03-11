@@ -50,6 +50,8 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 
 func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
 	// Find barcode pair with best match
+		// get list of keys from barcodeMap
+		// call bestMatch on that list
 	// get sample name
 	// trim barcodes off seq bases and qual scores
 

@@ -72,9 +72,13 @@ func TestBestMatch(t *testing.T) {
 	testOligos := make([][2]string, 2)
 	testOligos[0] = [2]string{"GTGTAA", "ATCAAT"}
 	testOligos[1] = [2]string{"GTGTAT", "ATCAAT"}
-	_, num := bestMatch(testOligos, "ATGTAAATTGAT") // 1 mismatch with testOligos[0], 2 with testOligos[1]
+	best, num := bestMatch(testOligos, "ATGTAAATTGAT") // 1 mismatch with testOligos[0], 2 with testOligos[1]
 	if num != 1 {
 		t.Errorf("bestMatch returned %d errors; expected 1.", num)
 	}
+	if best[0] != "GTGTAA" {
+		t.Errorf("bestMatch returned %s, expected 'GTGTAA'.", best[0])
+	}
 }
+
 
