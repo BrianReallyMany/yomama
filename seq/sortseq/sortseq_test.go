@@ -62,11 +62,19 @@ func TestNewSeqSorterInvalidInput(t *testing.T) {
 func TestSortSeq(t *testing.T) {
 	sorter := getSeqSorter()
 	seq := Seq{"foo_seq", "ATCGTACGTCTCGGCAGCGTCAGATGTGTATgattacaATTGATGGTGTTGCCACAGTCGTTTATTCTA", "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40"}
-	if sorter.barcodeMap[[2]string{"ATCGTACGTC", "TAGAATAAAC"}] != "sample1" {
-		t.Errorf("foo error.")
-	}
 	sorted := sorter.SortSeq(seq)
 	if bases := sorted.Bases; bases != "gattaca" {
 		t.Errorf("SortSeq returned a SortedSeq with bases = %s; expected 'gattaca'", bases)
 	}
 }
+
+func TestBestMatch(t *testing.T) {
+	testOligos := make([][2]string, 2)
+	testOligos[0] = [2]string{"GTGTAA", "ATCAAT"}
+	testOligos[1] = [2]string{"GTGTAT", "ATCAAT"}
+	_, num := bestMatch(testOligos, "ATGTAAATTGAT") // 1 mismatch with testOligos[0], 2 with testOligos[1]
+	if num != 1 {
+		t.Errorf("bestMatch returned %d errors; expected 1.", num)
+	}
+}
+

@@ -3,6 +3,7 @@ package sortseq
 import (
     	"strings"
 	. "github.com/BrianReallyMany/yomama/seq"
+	"github.com/BrianReallyMany/yomama/seq/sequtil"
 	"github.com/BrianReallyMany/yomama/seq/oligo"
 )
 
@@ -64,4 +65,16 @@ func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
 	// Return it.
 	seq.Bases = "gattaca"
 	return SortedSeq{seq, SortKey{}}
+}
+
+func bestMatch(oligos [][2]string, seq string) ([2]string, int) {
+	winner := [2]string{"", ""}
+	mismatches := len(seq) + 1
+	for _, pair := range oligos {
+		if misses := sequtil.MatchBeginAndEnd(pair, seq); misses < mismatches {
+			mismatches = misses
+			winner = pair
+		}
+	}
+	return winner, mismatches
 }
