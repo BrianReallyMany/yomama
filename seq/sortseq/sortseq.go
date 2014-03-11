@@ -80,3 +80,13 @@ func bestMatch(oligos [][2]string, seq string) ([2]string, int) {
 	}
 	return winner, mismatches
 }
+
+func getSliceOfKeys(m map[[2]string]string) [][2]string {
+	mySlice := make([][2]string, len(m))
+	i := 0
+	for k := range m {
+		mySlice[i] = k
+		i++
+	}
+	return mySlice
+}

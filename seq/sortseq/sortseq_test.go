@@ -81,4 +81,16 @@ func TestBestMatch(t *testing.T) {
 	}
 }
 
+func TestGetSliceOfKeys(t *testing.T) {
+	testMap := make(map[[2]string]string)
+	testMap[[2]string{"foo", "bar"}] = "baz"
+	testMap[[2]string{"dog", "cat"}] = "pig"
+	keys := getSliceOfKeys(testMap)
+	if len(keys) != 2 {
+		t.Errorf("getSliceOfKeys returned slice of length %d; expected 2.", len(keys))
+	}
+	if !(keys[0][0] == "foo" || keys[1][0] == "foo") {
+		t.Errorf("getSliceOfKeys returned slice without 'foo', expected foo. wtf.")
+	}
+}
 
