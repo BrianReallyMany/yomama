@@ -12,7 +12,7 @@ const StoreLineWidth = 120
 type storeEntry struct {
     startLine   uint
     headerLines uint
-    basesLines    uint
+    basesLines  uint
     qualLines   uint
 }
 
@@ -90,7 +90,11 @@ func (s *Store) AddSeq(seq Seq) error {
 // splitFixedWidth splits a byte slice into multiple slices with a length of the provided fixed
 // width. Any extra space on the last line will be filled with whitespaces.
 func splitFixedWidth(str []byte, fixedWidth int) [][]byte {
-	lines := len(str)/fixedWidth + 1
+	lines := len(str)/fixedWidth
+        if len(str)%fixedWidth != 0 {
+            lines++
+        }
+
 	splitStr := make([][]byte, lines)
 	for i := 0; i < lines; i++ {
 		toCopy := []byte(str)[i*fixedWidth : int(math.Min(float64((i+1)*fixedWidth), float64(len(str))))]
