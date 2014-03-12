@@ -38,6 +38,13 @@ func NewStore(fileName string) (*Store, error) {
     s.fileName = fileName
     s.seqIndex = make(map[SortKey][]storeEntry)
 
+    // Read the seqIndex from our map file
+    mapFile, err := os.Open("."+s.fileName+".map")
+    if err == nil {
+        decoder := gob.NewDecoder(mapFile)
+        decoder.Decode(&s.seqIndex)
+    }
+
     return s, nil
 }
 
@@ -84,6 +91,9 @@ func (s *Store) AddSeq(seq Seq) error {
 
     // Set new line count
     s.lineCount += uint(len(headerLines)) + uint(len(basesLines)) + uint(len(qualLines))
+
+    // Write the seqIndex file for persistence
+    s.writeMapFile()
 
     return nil
 }
