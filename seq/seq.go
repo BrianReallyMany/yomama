@@ -14,18 +14,17 @@ type Seq struct {
 	Reverse bool
 }
 
-func TrimEnds(seq Seq, fromBegin, fromEnd int) (Seq, error) {
+func (s *Seq) TrimEnds(fromBegin, fromEnd int) error {
 	// Check for error
-	if len(seq.Bases) < fromBegin + fromEnd {
-		return Seq{}, errors.New("TrimEnds called on seq that is too short")
+	if len(s.Bases) < fromBegin + fromEnd {
+		return errors.New("TrimEnds called on seq that is too short")
 	}
 	// Trim Bases
-	allBases := []byte(seq.Bases)
-	bases := string(allBases[fromBegin:len(seq.Bases)-fromEnd])
+	allBases := []byte(s.Bases)
+	s.Bases = string(allBases[fromBegin:len(s.Bases)-fromEnd])
 	// Trim Scores
-	allScores := strings.Split(seq.Scores, " ")
+	allScores := strings.Split(s.Scores, " ")
 	scoreSlice := allScores[fromBegin:len(allScores)-fromEnd]
-	scores := strings.Join(scoreSlice, " ")
-	// Return new Seq with correct Bases and Scores
-	return Seq{seq.Header, bases, scores, seq.Locus, seq.Sample, seq.Reverse}, nil
+	s.Scores = strings.Join(scoreSlice, " ")
+	return nil
 }
