@@ -72,15 +72,19 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases)
 	// Verify acceptable number of mismatches
 	if mismatches > s.bdiffs {
-		return Seq{}, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence"}
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence"}
 	}
 	// Get sample name
 	sampleName, ok  := s.barcodeMap[bestBarcodes]
 	if !ok {
-		return Seq{}, &SeqSorterError{"Couldn't find sample name to match barcode pair. This is strange."}
+		return seq, &SeqSorterError{"Couldn't find sample name to match barcode pair. This is strange."}
 	}
 	// Trim barcodes off seq bases and qual scores
-	// TODO got to find a way to modify these guys in place; it's silly to construct three new Seqs in this one function.
+	err := seq.TrimEnds(len(bestBarcodes[0]), len(bestBarcodes[1]))
+	if err != nil {
+		return seq, &SeqSorterError{"Error trimming ends of seq."}
+	}
+
 	
 
 	// TODO flag for "check reversed linker/primer pairs"?
