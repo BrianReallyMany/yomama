@@ -27,7 +27,7 @@ func getSeqSorter() SeqSorter{
 		[2]string{"ATCGTACGTC", "TAGAATAAAC"}: "sample1",
 	}
 	var links = [][2]string{[2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}}
-	return SeqSorter{priMap, barMap, links}
+	return SeqSorter{priMap, barMap, links, SeqSorterOptions{}}
 }
 
 func TestNewSeqSorterValidInput(t *testing.T) {

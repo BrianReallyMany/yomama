@@ -1,6 +1,7 @@
 package sortseq
 
 import (
+	"fmt"
     	"strings"
 	. "github.com/BrianReallyMany/yomama/seq"
 	"github.com/BrianReallyMany/yomama/seq/sequtil"
@@ -11,7 +12,16 @@ type SeqSorter struct {
 	primerMap map[[2]string]string
 	barcodeMap map[[2]string]string
 	linkers [][2]string
+	SeqSorterOptions
 }
+
+type SeqSorterOptions struct {
+	bdiffs int
+	ldiffs int
+	pdiffs int
+	checkReverse bool
+}
+
 
 func NewSeqSorter(input string) (*SeqSorter, error) {
 	lines := strings.Split(input, "\n")
@@ -44,17 +54,22 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 			linkers[len(linkers)-1] = [2]string{fields[1], fields[2]}
 		}
 	}
-	sorter := &SeqSorter{primerMap, barcodeMap, linkers}
+	sorter := &SeqSorter{primerMap, barcodeMap, linkers, SeqSorterOptions{}}
 	return sorter, nil
 }
 
 func (s *SeqSorter) SortSeq(seq Seq) Seq {
+	// TODO be flexible; if seq already has sample, skip debarcoding...
 	// Find barcode pair with best match
-		// get list of keys from barcodeMap
-		// call bestMatch on that list
+	barcodeKeys := getSliceOfKeys(s.barcodeMap)
+	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases)
+	fmt.Println(bestBarcodes)
+	fmt.Println(mismatches)
+
 	// get sample name
 	// trim barcodes off seq bases and qual scores
 
+	// TODO flag for "check reversed linker/primer pairs"?
 	// Find linker pair with best match
 	// trim linkers off seq bases and qual scores
 
@@ -67,6 +82,8 @@ func (s *SeqSorter) SortSeq(seq Seq) Seq {
 	return Seq{"", "gattaca", "", "", "", true}
 }
 
+// From a list of barcode pairs, return the pair that matches
+// most closely, and the number of bases that don't match
 func bestMatch(oligos [][2]string, seq string) ([2]string, int) {
 	winner := [2]string{"", ""}
 	mismatches := len(seq) + 1
