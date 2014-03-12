@@ -1,6 +1,7 @@
 package sortseq
 
 import (
+    "encoding/gob"
     . "github.com/BrianReallyMany/yomama/seq"
     "math"
     "os"
@@ -83,6 +84,25 @@ func (s *Store) AddSeq(seq Seq) error {
 
     // Set new line count
     s.lineCount += uint(len(headerLines)) + uint(len(basesLines)) + uint(len(qualLines))
+
+    return nil
+}
+
+// writeMapFile writes the store's map into a binary file so it can reload it's seq index map later
+func (s *Store) writeMapFile() error {
+    file, err := os.Create("."+s.fileName+".map")
+    if err != nil {
+        return err
+    }
+    defer file.Close()
+
+    // Create a binary gob encoder to serialize the map
+    encoder := gob.NewEncoder(file)
+
+    // Write the map to the file
+    if err := encoder.Encode(s.seqIndex); err != nil {
+        return err
+    }
 
     return nil
 }
