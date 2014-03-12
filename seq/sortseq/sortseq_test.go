@@ -66,6 +66,12 @@ func TestSortSeq(t *testing.T) {
 	if bases := sorted.Bases; bases != "gattaca" {
 		t.Errorf("SortSeq returned a Seq with bases = %s; expected 'gattaca'", bases)
 	}
+	if locus := sorted.Locus; locus != "locus1" {
+		t.Errorf("SortSeq returned Seq with Locus = %s; expected 'locus1'", locus)
+	}
+	if sample := sorted.Sample; sample != "sample1" {
+		t.Errorf("SortSeq returned Seq with Sample = %s; expected 'sample1'", sample)
+	}
 }
 
 func TestBestMatch(t *testing.T) {

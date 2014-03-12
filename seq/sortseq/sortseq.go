@@ -85,22 +85,40 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 		return seq, &SeqSorterError{"Error trimming ends of seq."}
 	}
 
-	
-
 	// TODO flag for "check reversed linker/primer pairs"?
+
 	// Find linker pair with best match
+	bestLinkers, mismatches := bestMatch(s.linkers, seq.Bases)
+	if mismatches > s.ldiffs {
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between linker and sequence"}
+	}
 	// trim linkers off seq bases and qual scores
+	err = seq.TrimEnds(len(bestLinkers[0]), len(bestLinkers[1]))
+	if err != nil {
+		return seq, &SeqSorterError{"Error trimming ends of debarcoded seq."}
+	}
 
 	// Find primer pair with best match
-	// get sample name
+	primerKeys := getSliceOfKeys(s.primerMap)
+	bestPrimers, mismatches := bestMatch(primerKeys, seq.Bases)
+	if mismatches > s.pdiffs {
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between primer and sequence"}
+	}
+	locus, ok := s.primerMap[bestPrimers]
+	if !ok {
+		return seq, &SeqSorterError{"Couldn't find locus name to match primer pair."}
+	}
 	// trim primers off seq bases and qual scores
+	err = seq.TrimEnds(len(bestPrimers[0]), len(bestPrimers[1]))
+	if err != nil {
+		return seq, &SeqSorterError{"Error trimming ends of delinkered seq."}
+	}
 
-	// Make new Seq (or update Seq) with all this info
-	// Return it.
-	// TODO these are here so it builds...
 	fmt.Println(sampleName)
 	fmt.Println(mismatches)
-	return Seq{"", "gattaca", "", "", "", true}, nil
+	seq.Sample = sampleName
+	seq.Locus = locus
+	return seq, nil
 }
 
 // From a list of barcode pairs, return the pair that matches
