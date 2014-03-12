@@ -62,7 +62,7 @@ func TestNewSeqSorterInvalidInput(t *testing.T) {
 func TestSortSeq(t *testing.T) {
 	sorter := getSeqSorter()
 	seq := Seq{"foo_seq", "ATCGTACGTCTCGGCAGCGTCAGATGTGTATgattacaATTGATGGTGTTGCCACAGTCGTTTATTCTA", "40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40 40", "", "", true}
-	sorted := sorter.SortSeq(seq)
+	sorted, _ := sorter.SortSeq(seq)
 	if bases := sorted.Bases; bases != "gattaca" {
 		t.Errorf("SortSeq returned a Seq with bases = %s; expected 'gattaca'", bases)
 	}

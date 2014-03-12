@@ -22,6 +22,13 @@ type SeqSorterOptions struct {
 	checkReverse bool
 }
 
+type SeqSorterError struct {
+	Problem string
+}
+
+func (e *SeqSorterError) Error() string {
+	return fmt.Sprintf("SeqSorter error occurred: %s", e.Problem)
+}
 
 func NewSeqSorter(input string) (*SeqSorter, error) {
 	lines := strings.Split(input, "\n")
@@ -58,11 +65,17 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	return sorter, nil
 }
 
-func (s *SeqSorter) SortSeq(seq Seq) Seq {
+func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	// TODO be flexible; if seq already has sample, skip debarcoding...
 	// Find barcode pair with best match
 	barcodeKeys := getSliceOfKeys(s.barcodeMap)
 	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases)
+	if mismatches > s.bdiffs {
+		return Seq{}, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence"}
+	}
+
+
+	// TODO these are here so it builds...
 	fmt.Println(bestBarcodes)
 	fmt.Println(mismatches)
 
@@ -79,7 +92,7 @@ func (s *SeqSorter) SortSeq(seq Seq) Seq {
 
 	// Make new Seq (or update Seq) with all this info
 	// Return it.
-	return Seq{"", "gattaca", "", "", "", true}
+	return Seq{"", "gattaca", "", "", "", true}, nil
 }
 
 // From a list of barcode pairs, return the pair that matches
