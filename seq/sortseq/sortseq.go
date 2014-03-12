@@ -73,13 +73,15 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	if mismatches > s.bdiffs {
 		return Seq{}, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence"}
 	}
+	sampleName, ok  := s.barcodeMap[bestBarcodes]
+	if !ok {
+		return Seq{}, &SeqSorterError{"Couldn't find sample name to match barcode pair. This is strange."}
+	}
 
 
-	// TODO these are here so it builds...
-	fmt.Println(bestBarcodes)
-	fmt.Println(mismatches)
 
-	// get sample name
+
+
 	// trim barcodes off seq bases and qual scores
 
 	// TODO flag for "check reversed linker/primer pairs"?
@@ -92,6 +94,9 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 
 	// Make new Seq (or update Seq) with all this info
 	// Return it.
+	// TODO these are here so it builds...
+	fmt.Println(sampleName)
+	fmt.Println(mismatches)
 	return Seq{"", "gattaca", "", "", "", true}, nil
 }
 
