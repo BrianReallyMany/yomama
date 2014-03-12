@@ -1,6 +1,7 @@
 package sortseq
 
 import (
+    . "github.com/BrianReallyMany/yomama/seq"
     "math"
     "os"
 )
@@ -39,7 +40,7 @@ func NewStore(fileName string) (*Store, error) {
     return s, nil
 }
 
-func (s *Store) AddSeq(seq SortedSeq) error {
+func (s *Store) AddSeq(seq Seq) error {
     // Open and verify the file
     file, err := os.OpenFile(s.fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
     if err != nil {
@@ -48,9 +49,10 @@ func (s *Store) AddSeq(seq SortedSeq) error {
     defer file.Close()
 
     // Make sure the key exists, make its section if it doesn't
-    _, keyExists := s.seqIndex[seq.SortKey]
+    mySortKey := SortKey{seq.Locus, seq.Sample}
+    _, keyExists := s.seqIndex[mySortKey]
     if !keyExists {
-        s.seqIndex[seq.SortKey] = make([]storeEntry, 0, 1)
+        s.seqIndex[mySortKey] = make([]storeEntry, 0, 1)
     }
 
     // Split data into fixed-width strings
@@ -59,7 +61,7 @@ func (s *Store) AddSeq(seq SortedSeq) error {
     qualLines := splitFixedWidth([]byte(seq.Scores), StoreLineWidth)
 
     // Add the store entry
-    s.seqIndex[seq.SortKey] = append(s.seqIndex[seq.SortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
+    s.seqIndex[mySortKey] = append(s.seqIndex[mySortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
 
     // Write to the store file
     file.Seek(0, 2) // Go to the end of the file

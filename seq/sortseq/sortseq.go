@@ -48,7 +48,7 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	return sorter, nil
 }
 
-func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
+func (s *SeqSorter) SortSeq(seq Seq) Seq {
 	// Find barcode pair with best match
 		// get list of keys from barcodeMap
 		// call bestMatch on that list
@@ -62,11 +62,9 @@ func (s *SeqSorter) SortSeq(seq Seq) SortedSeq {
 	// get sample name
 	// trim primers off seq bases and qual scores
 
-	// Make SortKey
-	// Make SortedSeq
+	// Make new Seq (or update Seq) with all this info
 	// Return it.
-	seq.Bases = "gattaca"
-	return SortedSeq{seq, SortKey{}}
+	return Seq{"", "gattaca", "", "", "", true}
 }
 
 func bestMatch(oligos [][2]string, seq string) ([2]string, int) {
