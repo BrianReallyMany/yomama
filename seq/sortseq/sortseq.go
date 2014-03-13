@@ -24,6 +24,7 @@ type SeqSorterOptions struct {
 
 type SeqSorterError struct {
 	Problem string
+	Where string
 }
 
 func (e *SeqSorterError) Error() string {
@@ -72,17 +73,17 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases)
 	// Verify acceptable number of mismatches
 	if mismatches > s.bdiffs {
-		return seq, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence"}
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence", "barcode"}
 	}
 	// Get sample name
 	sampleName, ok  := s.barcodeMap[bestBarcodes]
 	if !ok {
-		return seq, &SeqSorterError{"Couldn't find sample name to match barcode pair. This is strange."}
+		return seq, &SeqSorterError{"Couldn't find sample name to match barcode pair. This is strange.", "barcode"}
 	}
 	// Trim barcodes off seq bases and qual scores
 	err := seq.TrimEnds(len(bestBarcodes[0]), len(bestBarcodes[1]))
 	if err != nil {
-		return seq, &SeqSorterError{"Error trimming ends of seq."}
+		return seq, &SeqSorterError{"Error trimming ends of seq.", "barcode"}
 	}
 
 	// TODO flag for "check reversed linker/primer pairs"?
@@ -90,32 +91,31 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	// Find linker pair with best match
 	bestLinkers, mismatches := bestMatch(s.linkers, seq.Bases)
 	if mismatches > s.ldiffs {
-		return seq, &SeqSorterError{"Exceeded maximum number of differences between linker and sequence"}
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between linker and sequence", "linker"}
 	}
 	// trim linkers off seq bases and qual scores
 	err = seq.TrimEnds(len(bestLinkers[0]), len(bestLinkers[1]))
 	if err != nil {
-		return seq, &SeqSorterError{"Error trimming ends of debarcoded seq."}
+		return seq, &SeqSorterError{"Error trimming ends of debarcoded seq.", "linker"}
 	}
 
 	// Find primer pair with best match
 	primerKeys := getSliceOfKeys(s.primerMap)
 	bestPrimers, mismatches := bestMatch(primerKeys, seq.Bases)
 	if mismatches > s.pdiffs {
-		return seq, &SeqSorterError{"Exceeded maximum number of differences between primer and sequence"}
+		return seq, &SeqSorterError{"Exceeded maximum number of differences between primer and sequence", "primer"}
 	}
 	locus, ok := s.primerMap[bestPrimers]
 	if !ok {
-		return seq, &SeqSorterError{"Couldn't find locus name to match primer pair."}
+		return seq, &SeqSorterError{"Couldn't find locus name to match primer pair.", "primer"}
 	}
-	// trim primers off seq bases and qual scores
+	// Trim primers off seq bases and qual scores
 	err = seq.TrimEnds(len(bestPrimers[0]), len(bestPrimers[1]))
 	if err != nil {
-		return seq, &SeqSorterError{"Error trimming ends of delinkered seq."}
+		return seq, &SeqSorterError{"Error trimming ends of delinkered seq.", "primer"}
 	}
 
-	fmt.Println(sampleName)
-	fmt.Println(mismatches)
+	// Update seq info and return
 	seq.Sample = sampleName
 	seq.Locus = locus
 	return seq, nil
