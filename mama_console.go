@@ -26,9 +26,20 @@ func (c *MamaConsole) Prompt() string {
     return "Mama> "
 }
 
+// For the lost
+func (c *MamaConsole) Help() string {
+	return "Available commands: echo, system, exit"
+}
+
 // Execute some yomama commands
 func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
     switch cmd {
+    case "":
+	    fmt.Println(c.Help())
+
+    case "help":
+	    fmt.Println(c.Help())
+
     case "echo":
         fmt.Println(string(line))
         break
