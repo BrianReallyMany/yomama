@@ -12,11 +12,19 @@ func makeTestSeq() Seq {
 	return Seq{header, bases, scores, locus, sample, reverse}
 }
 
-
-func TestReverseComplementSeq(t *testing.T) {
+func TestMakeTestSeq(t *testing.T) {
 	seq := makeTestSeq()
 	if seq.Bases != "GATTACA" {
 		t.Errorf("makeTestSeq returned seq with Bases %s; expected 'GATTACA'", seq.Bases)
+	}
+}
+
+func TestToString(t *testing.T) {
+	seq := makeTestSeq()
+	expected := "Header: foo_seq\nBases: GATTACA\nScores: 30 30 30 30 30 30 30\n"
+	expected += "Locus: locus1\nSample: sample1\nReverse: false"
+	if actual := seq.ToString(); actual != expected {
+		t.Errorf("Seq.ToString returned %s; expected %s", actual, expected)
 	}
 }
 

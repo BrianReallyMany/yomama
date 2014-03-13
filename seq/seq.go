@@ -2,6 +2,7 @@ package seq
 
 import (
 	"strings"
+	"strconv"
 	"errors"
 )
 
@@ -12,6 +13,16 @@ type Seq struct {
 	Locus   string
 	Sample  string
 	Reverse bool
+}
+
+func (s *Seq) ToString() string {
+	result := "Header: " + s.Header + "\n"
+	result += "Bases: " + s.Bases + "\n"
+	result += "Scores: " + s.Scores + "\n"
+	result += "Locus: " + s.Locus + "\n"
+	result += "Sample: " + s.Sample + "\n"
+	result += "Reverse: " + strconv.FormatBool(s.Reverse)
+	return result
 }
 
 func (s *Seq) TrimEnds(fromBegin, fromEnd int) error {
