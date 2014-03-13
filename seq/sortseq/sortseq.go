@@ -3,6 +3,7 @@ package sortseq
 import (
 	"fmt"
     	"strings"
+	"strconv"
 	. "github.com/BrianReallyMany/yomama/seq"
 	"github.com/BrianReallyMany/yomama/seq/sequtil"
 	"github.com/BrianReallyMany/yomama/seq/oligo"
@@ -64,6 +65,18 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 	}
 	sorter := &SeqSorter{primerMap, barcodeMap, linkers, SeqSorterOptions{}}
 	return sorter, nil
+}
+
+func (s *SeqSorter) ToString() string {
+	result := "primerMap: " + strconv.Itoa(len(s.primerMap)) + " entries\n"
+	result += "barcodeMap: " + strconv.Itoa(len(s.barcodeMap)) + " entries\n"
+	result += "linkers: " + strconv.Itoa(len(s.linkers)) + " entries\n"
+	result += "options:\n"
+	result += "\tbdiffs=" + strconv.Itoa(s.bdiffs) + "\n"
+	result += "\tldiffs=" + strconv.Itoa(s.ldiffs) + "\n"
+	result += "\tpdiffs=" + strconv.Itoa(s.pdiffs) + "\n"
+	result += "\tcheckReverse=" + strconv.FormatBool(s.checkReverse)
+	return result
 }
 
 func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {

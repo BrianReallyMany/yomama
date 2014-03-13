@@ -100,3 +100,17 @@ func TestGetSliceOfKeys(t *testing.T) {
 	}
 }
 
+func TestSeqSorterToString(t *testing.T) {
+	sorter := getSeqSorter()
+	expected := "primerMap: 1 entries\n"
+	expected += "barcodeMap: 1 entries\n"
+	expected += "linkers: 1 entries\n"
+	expected += "options:\n"
+	expected += "\tbdiffs=0\n"
+	expected += "\tldiffs=0\n"
+	expected += "\tpdiffs=0\n"
+	expected += "\tcheckReverse=false"
+	if actual := sorter.ToString(); actual != expected {
+		t.Errorf("SeqSorter.ToString returned %s; expected %s", actual, expected)
+	}
+}
