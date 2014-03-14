@@ -117,17 +117,36 @@ func (s *Store) FetchSeqs(key SortKey) []Seq {
 
     for i, entry := range entries {
         header := make([]byte, entry.headerLines*storeLineWidth)
-        //bases := make([]byte, entry.basesLines*storeLineWidth)
-        //scores := make([]byte, entry.scoresLines*storeLineWidth)
+        bases := make([]byte, entry.basesLines*storeLineWidth)
+        scores := make([]byte, entry.scoresLines*storeLineWidth)
 
         file.Seek(int64(entry.startLine*storeLineWidth), os.SEEK_SET)
 
+        // Grab the header
         for j := 0; j < int(entry.headerLines); j++ {
             file.Read(header[j*storeLineWidth:(j+1)*storeLineWidth]) // Read current line
             file.Seek(1, os.SEEK_CUR) // Skip newline
         }
 
+        // Grab the bases
+        for j := 0; j < int(entry.basesLines); j++ {
+            file.Read(bases[j*storeLineWidth:(j+1)*storeLineWidth]) // Read current line
+            file.Seek(1, os.SEEK_CUR) // Skip newline
+        }
+
+        // Grab the scores
+        for j := 0; j < int(entry.scoresLines); j++ {
+            file.Read(scores[j*storeLineWidth:(j+1)*storeLineWidth]) // Read current line
+            file.Seek(1, os.SEEK_CUR) // Skip newline
+        }
+
+        // Construct the seq
         seqs[i].Header = string(bytes.Trim(header, " "))
+        seqs[i].Bases = string(bytes.Trim(bases, " "))
+        seqs[i].Scores = string(bytes.Trim(scores, " "))
+        seqs[i].Sample = key.Sample
+        seqs[i].Locus = key.Locus
+        seqs[i].Reverse = false
     }
 
     return seqs

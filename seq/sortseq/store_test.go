@@ -25,7 +25,7 @@ func TestStore_AddFetchSeq(t *testing.T) {
         t.Fail()
     }
 
-    if seqs[0].Header != strings.Repeat("testSeq1", 100) {
+    if seqs[0] != testSeq1 {
         t.Fail()
     }
 
