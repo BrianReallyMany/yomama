@@ -1,6 +1,7 @@
 package sortseq
 
 import (
+    "bytes"
     "encoding/gob"
     . "github.com/BrianReallyMany/yomama/seq"
     "math"
@@ -126,7 +127,7 @@ func (s *Store) FetchSeqs(key SortKey) []Seq {
             file.Seek(1, os.SEEK_CUR) // Skip newline
         }
 
-        seqs[i].Header = string(header)
+        seqs[i].Header = string(bytes.Trim(header, " "))
     }
 
     return seqs
