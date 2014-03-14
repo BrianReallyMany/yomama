@@ -1,15 +1,14 @@
 package iomama
 
 import (
-    "bufio"
     "strings"
     "testing"
     . "github.com/BrianReallyMany/yomama/seq"
 )
 
 func getFastaQualReader() *FastaQualReader {
-    fbuffer := bufio.NewReader(strings.NewReader(">seq1\nATGCT\n>seq2\nATGCG\n>seq3\nATGCA"))
-    qbuffer := bufio.NewReader(strings.NewReader(">seq1\n20 30 30 30 20\n>seq2\n30 35 35 35 40\n>seq3\n40 40 40 40 20"))
+    fbuffer := strings.NewReader(">seq1\nATGCT\n>seq2\nATGCG\n>seq3\nATGCA")
+    qbuffer := strings.NewReader(">seq1\n20 30 30 30 20\n>seq2\n30 35 35 35 40\n>seq3\n40 40 40 40 20")
     fqreader := NewFastaQualReader(fbuffer, qbuffer)
     return fqreader
 }
