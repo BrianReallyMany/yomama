@@ -2,8 +2,7 @@ package iomama
 
 import (
     "bufio"
-//    "bytes"
-//    "io"
+    "io"
     "github.com/BrianReallyMany/yomama/iomama/fasta"
     "github.com/BrianReallyMany/yomama/iomama/qual"
     . "github.com/BrianReallyMany/yomama/seq"
@@ -19,10 +18,10 @@ type FastaQualReader struct {
     next Seq  // Stores next Seq. Used for iteration
 }
 
-func NewFastaQualReader(fbuffer, qbuffer *bufio.Reader) *FastaQualReader {
+func NewFastaQualReader(fbuffer, qbuffer io.Reader) *FastaQualReader {
     fq := &FastaQualReader{}
-    fq.freader = fasta.NewFastaReader(fbuffer)
-    fq.qreader = qual.NewQualReader(qbuffer)
+    fq.freader = fasta.NewFastaReader(bufio.NewReader(fbuffer))
+    fq.qreader = qual.NewQualReader(bufio.NewReader(qbuffer))
 
     return fq
 }
