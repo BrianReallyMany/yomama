@@ -8,13 +8,13 @@ import (
 )
 
 // Fixed line width in seq store file.
-const StoreLineWidth = 120
+const storeLineWidth = 120
 
 type storeEntry struct {
     startLine   uint
     headerLines uint
     basesLines  uint
-    qualLines   uint
+    scoresLines   uint
 }
 
 // Store facilitates the storage and retrieval of sorted seqs
@@ -28,10 +28,10 @@ type Store struct {
 func NewStore(fileName string) (*Store, error) {
     // Make sure the provided file exists. Create it if it doesn't.
     file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    defer file.Close()
     if err != nil {
         return nil, err
     }
-    defer file.Close()
 
     s := &Store{}
 
@@ -51,10 +51,10 @@ func NewStore(fileName string) (*Store, error) {
 func (s *Store) AddSeq(seq Seq) error {
     // Open and verify the file
     file, err := os.OpenFile(s.fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    defer file.Close()
     if err != nil {
         return err
     }
-    defer file.Close()
 
     // Make sure the key exists, make its section if it doesn't
     mySortKey := SortKey{seq.Locus, seq.Sample}
@@ -64,12 +64,12 @@ func (s *Store) AddSeq(seq Seq) error {
     }
 
     // Split data into fixed-width strings
-    headerLines := splitFixedWidth([]byte(seq.Header), StoreLineWidth)
-    basesLines := splitFixedWidth([]byte(seq.Bases), StoreLineWidth)
-    qualLines := splitFixedWidth([]byte(seq.Scores), StoreLineWidth)
+    headerLines := splitFixedWidth([]byte(seq.Header), storeLineWidth)
+    basesLines := splitFixedWidth([]byte(seq.Bases), storeLineWidth)
+    scoresLines := splitFixedWidth([]byte(seq.Scores), storeLineWidth)
 
     // Add the store entry
-    s.seqIndex[mySortKey] = append(s.seqIndex[mySortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(qualLines))})
+    s.seqIndex[mySortKey] = append(s.seqIndex[mySortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(scoresLines))})
 
     // Write to the store file
     file.Seek(0, 2) // Go to the end of the file
@@ -84,18 +84,52 @@ func (s *Store) AddSeq(seq Seq) error {
         file.WriteString("\n")
     }
 
-    for _, line := range qualLines {
+    for _, line := range scoresLines {
         file.Write(line)
         file.WriteString("\n")
     }
 
     // Set new line count
-    s.lineCount += uint(len(headerLines)) + uint(len(basesLines)) + uint(len(qualLines))
+    s.lineCount += uint(len(headerLines)) + uint(len(basesLines)) + uint(len(scoresLines))
 
     // Write the seqIndex file for persistence
     s.writeMapFile()
 
     return nil
+}
+
+func (s *Store) FetchSeqs(key SortKey) []Seq {
+    // Open and verify the file
+    file, err := os.OpenFile(s.fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    defer file.Close()
+    if err != nil {
+        return nil
+    }
+
+    // Get the entries for the current key
+    entries, ok := s.seqIndex[key]
+    if !ok {
+        return nil
+    }
+
+    seqs := make([]Seq, len(entries))
+
+    for i, entry := range entries {
+        header := make([]byte, entry.headerLines*storeLineWidth)
+        //bases := make([]byte, entry.basesLines*storeLineWidth)
+        //scores := make([]byte, entry.scoresLines*storeLineWidth)
+
+        file.Seek(int64(entry.startLine*storeLineWidth), os.SEEK_SET)
+
+        for j := 0; j < int(entry.headerLines); j++ {
+            file.Read(header[j*storeLineWidth:(j+1)*storeLineWidth]) // Read current line
+            file.Seek(1, os.SEEK_CUR) // Skip newline
+        }
+
+        seqs[i].Header = string(header)
+    }
+
+    return seqs
 }
 
 // writeMapFile writes the store's map into a binary file so it can reload it's seq index map later
