@@ -1,4 +1,5 @@
 yomama
 *.go~
 local_files/*
+*.store
 
