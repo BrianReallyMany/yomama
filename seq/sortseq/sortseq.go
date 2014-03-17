@@ -1,12 +1,14 @@
 package sortseq
 
 import (
+	"io"
+	"bufio"
 	"fmt"
+	"errors"
     	"strings"
 	"strconv"
 	. "github.com/BrianReallyMany/yomama/seq"
 	"github.com/BrianReallyMany/yomama/seq/sequtil"
-	"github.com/BrianReallyMany/yomama/seq/oligo"
 )
 
 type SeqSorter struct {
@@ -32,22 +34,27 @@ func (e *SeqSorterError) Error() string {
 	return fmt.Sprintf("SeqSorter error occurred: %s", e.Problem)
 }
 
-func NewSeqSorter(input string) (*SeqSorter, error) {
-	lines := strings.Split(input, "\n")
+func NewSeqSorter(reader io.Reader) (*SeqSorter, error) {
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)
-	ok := oligo.ValidateOligoText(input)
-	if !ok {
-		return &SeqSorter{}, &oligo.OligoError{"Failed to validate oligo file\n"}
-	}
-	numLinkers := oligo.CountLinkers(input)
-	linkers := make([][2]string, numLinkers)
-	for _, line := range lines {
-		if line == "" {
+	linkers := make([][2]string, 0)
+
+	// Process oligo file line by line
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields, err := validateOligoLine(line)
+		if err != nil {
+			return &SeqSorter{}, err
+			// TODO better error
+		}
+
+		// Don't fail just because you found an empty line
+		if len(fields) == 0 {
 			continue
 		}
-		oligotype := oligo.OligoType(line)
-		fields := strings.Split(line, "\t")
+
+		oligotype := fields[0]
 		switch oligotype {
 		case "":
 			continue
@@ -60,11 +67,42 @@ func NewSeqSorter(input string) (*SeqSorter, error) {
 			oligoID := fields[3]
 			primerMap[oligoSeqs] = oligoID
 		case "linker":
-			linkers[len(linkers)-1] = [2]string{fields[1], fields[2]}
+			linkers = append(linkers, [2]string{fields[1], fields[2]})
 		}
 	}
 	sorter := &SeqSorter{primerMap, barcodeMap, linkers, SeqSorterOptions{}}
 	return sorter, nil
+}
+
+func validateOligoLine(line string) ([]string, error) {
+	line = strings.Trim(line, "\n ")
+	fields := strings.Split(line, "\t")
+	switch oligotype := fields[0]; oligotype {
+	case "barcode":
+		if (len(fields) != 4 || fields[1] == "" || fields[3] == "") {
+			return fields, errors.New("bad barcode")
+			// TODO better errors
+		}
+		return fields, nil
+	case "primer":
+		if (len(fields) != 4 || fields[1] == "" || fields[3] == "") {
+			return fields, errors.New("bad primer")
+		}
+		return fields, nil
+	case "linker":
+		if len(fields) < 2 {
+			return fields, errors.New("bad linker")
+		}
+		return fields, nil
+	default:
+		fmt.Printf("Unkown oligo type encountered: %s\n", oligotype)
+	}
+	return fields, errors.New("Invalid oligo line.")
+}
+
+func oligoType(line string) string {
+	fields := strings.Split(line, "\t")
+	return fields[0]
 }
 
 func (s *SeqSorter) ToString() string {

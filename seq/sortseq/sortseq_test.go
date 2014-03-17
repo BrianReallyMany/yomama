@@ -1,11 +1,13 @@
 package sortseq
 
 import (
+	"bufio"
+	"strings"
 	"testing"
 	. "github.com/BrianReallyMany/yomama/seq"
 )
 
-func getFakeOligoText() string {
+func getOligoText() string {
 	result := "barcode\tATCGTACGTC\tTAGAATAAAC\tsample1\n"
 	result += "linker\tTCGGCAGCGTCAGAT\tGACTGTGGCAACACC\n"
 	result += "primer\tGTGTAT\tATCAAT\tlocus1\n"
@@ -31,8 +33,9 @@ func getSeqSorter() SeqSorter{
 }
 
 func TestNewSeqSorterValidInput(t *testing.T) {
-	text := getFakeOligoText()
-	sorter, _ := NewSeqSorter(text)
+	text := getOligoText()
+	buffer := bufio.NewReader(strings.NewReader(text))
+	sorter, _ := NewSeqSorter(buffer)
 	primerinput := [2]string{"GTGTAT", "ATCAAT"}
 	primeroutput := sorter.primerMap[primerinput]
 
@@ -53,7 +56,8 @@ func TestNewSeqSorterValidInput(t *testing.T) {
 
 func TestNewSeqSorterInvalidInput(t *testing.T) {
 	text := getInvalidOligoText()
-	_, err := NewSeqSorter(text)
+	buffer := bufio.NewReader(strings.NewReader(text))
+	_, err := NewSeqSorter(buffer)
 	if err == nil {
 		t.Errorf("NewSeqSorter failed to return error on invalid input, expected error.")
 	}
