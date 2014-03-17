@@ -1,9 +1,9 @@
 package oligo
 
 import (
+	"bufio"
 	"fmt"
     	"strings"
-    	"io/ioutil"
 )
 
 type OligoError struct {
@@ -14,21 +14,13 @@ func (e *OligoError) Error() string {
 	return fmt.Sprintf("oligo problem was %s", e.Problem)
 }
 
-func ReadOligoFile(filename string) string {
-    text, err := ioutil.ReadFile(filename)
-    if err != nil {
-    	fmt.Printf("An error occurred while trying to read oligo file %s\n", filename)
-        fmt.Println(err)
-        return ""
-    }
-    return string(text)
-}
-
-func ValidateOligoText(input string) bool {
-	lines := strings.Split(input, "\n")
-	for _, line := range lines {
-		if line != "" {
-			ok := ValidateOligoLine(line)
+func ValidateOligoText(reader *bufio.Reader) bool {
+	var err error
+	var line []byte
+	for ; err == nil; line, err = reader.ReadBytes('\n') {
+		sline := string(line)
+		if sline != "" {
+			ok := ValidateOligoLine(sline)
 			if !ok {
 				return false
 			}
@@ -52,6 +44,7 @@ func CountLinkers(input string) int {
 }
 
 func ValidateOligoLine(line string) bool {
+	line = strings.Trim(line, "\n ")
 	fields := strings.Split(line, "\t")
 	switch oligotype := fields[0]; oligotype {
 	case "barcode":

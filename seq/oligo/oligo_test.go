@@ -1,6 +1,8 @@
 package oligo
 
 import (
+	"bufio"
+	"strings"
 	"fmt"
 	"testing"
 )
@@ -21,14 +23,16 @@ func getInvalidOligoText() string {
 
 func TestValidateOligoTextTrue(t *testing.T) {
 	text := getFakeOligoText()
-	if ok := ValidateOligoText(text); !ok {
+	buffer := bufio.NewReader(strings.NewReader(text))
+	if ok := ValidateOligoText(buffer); !ok {
 		t.Errorf("ValidateOligoText failed on valid text:\n%s", text)
 	}
 }
 
 func TestValidateOligoTextFalse(t *testing.T) {
 	text := getInvalidOligoText()
-	if ok := ValidateOligoText(text); ok {
+	buffer := bufio.NewReader(strings.NewReader(text))
+	if ok := ValidateOligoText(buffer); ok {
 		t.Errorf("ValidateOligoText returned 'ok' on bad input:\n%s", text)
 	}
 }
