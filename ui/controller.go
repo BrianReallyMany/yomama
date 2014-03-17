@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"bufio"
 	"os"
 	"fmt"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 	"github.com/BrianReallyMany/yomama/dozens"
 	"github.com/BrianReallyMany/yomama/seq/sortseq"
 	"github.com/BrianReallyMany/yomama/iomama"
+	"github.com/BrianReallyMany/yomama/iomama/fastq"
 )
 
 type MamaController struct {
@@ -26,21 +28,37 @@ func (c *MamaController) PrepFiles(args []string) {
 	if len(args) < 1 {
 		return
 	}
+
 	myPath := args[0]
+
 	fmt.Println("Verifying files...\n")
+
 	// Verify folder exists, contains .fasta, .qual and .oligo files
-	fastafiles, err := filepath.Glob(myPath + "/*.fasta")
-	if err != nil || len(fastafiles) != 1 {
-		fmt.Println("PrepFiles: locating fasta file failed")
-		fmt.Println(err)
-		return
+	var fastqFileName, fastaFileName, qualFileName string
+
+	fastqfiles, err := filepath.Glob(myPath + "/*.fastq")
+	if err != nil || len(fastqfiles) != 1 {
+		fmt.Println("No fastq files found, checking for fasta and qual files...")
+
+		fastafiles, err := filepath.Glob(myPath + "/*.fasta")
+		if err != nil || len(fastafiles) != 1 {
+			fmt.Println("PrepFiles: locating fasta file failed")
+			fmt.Println(err)
+			return
+		}
+		qualfiles, err := filepath.Glob(myPath + "/*.qual")
+		if err != nil || len(qualfiles) != 1 {
+			fmt.Println("PrepFiles: locating qual file failed")
+			fmt.Println(err)
+			return
+		}
+
+		fastaFileName = fastafiles[0]
+		qualFileName = qualfiles[0]
+	} else {
+		fastqFileName = fastqfiles[0]
 	}
-	qualfiles, err := filepath.Glob(myPath + "/*.qual")
-	if err != nil || len(qualfiles) != 1 {
-		fmt.Println("PrepFiles: locating qual file failed")
-		fmt.Println(err)
-		return
-	}
+
 	oligofiles, err := filepath.Glob(myPath + "/*.oligo")
 	if err != nil || len(oligofiles) != 1 {
 		fmt.Println("PrepFiles: locating oligo file failed")
@@ -48,19 +66,33 @@ func (c *MamaController) PrepFiles(args []string) {
 		return
 	}
 
-	fastafile, err := os.Open(fastafiles[0])
-	if err != nil {
-		fmt.Println("PrepFiles: fasta open failed")
-		fmt.Println(err)
-		return
+	var seqReader iomama.SeqReader
+
+	if fastqFileName != "" {
+		fastqfile, err := os.Open(fastqFileName)
+		if err != nil {
+			fmt.Println("PrepFiles: fastq open failed")
+			fmt.Println(err)
+			return
+		}
+
+		seqReader = fastq.NewFastqReader(bufio.NewReader(fastqfile))
+	} else if fastaFileName != "" && qualFileName != "" {
+		fastafile, err := os.Open(fastaFileName)
+		if err != nil {
+			fmt.Println("PrepFiles: fasta open failed")
+			fmt.Println(err)
+			return
+		}
+		qualfile, err := os.Open(qualFileName)
+		if err != nil {
+			return
+		}
+
+		// Make FastaQualReader, SeqSorter
+		seqReader = iomama.NewFastaQualReader(fastafile, qualfile)
 	}
-	qualfile, err := os.Open(qualfiles[0])
-	if err != nil {
-		return
-	}
-	
-	// Make FastaQualReader, SeqSorter
-	fqreader := iomama.NewFastaQualReader(fastafile, qualfile)
+
 
 	oligostring, err := ioutil.ReadFile(oligofiles[0])
 	if err != nil {
@@ -77,14 +109,14 @@ func (c *MamaController) PrepFiles(args []string) {
 	if err != nil {
 		return
 	}
-	
+
 	// Track where sorting fails and why
 	errorsMap := make(map[string]int)
 
 	fmt.Println("Reading in sequences...")
 
-	for fqreader.HasNext() {
-		seq := fqreader.Next()
+	for seqReader.HasNext() {
+		seq := seqReader.Next()
 		sortedseq, err := sorter.SortSeq(seq)
 		if err != nil {
 			// Add entry to errorsMap

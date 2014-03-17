@@ -1,4 +1,4 @@
-package fasta
+package fastq
 
 import (
     "bufio"
