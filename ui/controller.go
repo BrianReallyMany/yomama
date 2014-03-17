@@ -2,16 +2,16 @@ package ui
 
 import (
 	"bufio"
+	"strconv"
+	"log"
 	"os"
-	"fmt"
+	"os/exec"
 	"path/filepath"
-    	"log"
-    	"os/exec"
 	"github.com/BrianReallyMany/yomama/dozens"
-	"github.com/BrianReallyMany/yomama/seq/sortseq"
 	"github.com/BrianReallyMany/yomama/iomama"
 	"github.com/BrianReallyMany/yomama/iomama/fastaqual"
 	"github.com/BrianReallyMany/yomama/iomama/fastq"
+	"github.com/BrianReallyMany/yomama/seq/sortseq"
 )
 
 type MamaController struct {
@@ -19,39 +19,39 @@ type MamaController struct {
 
 // Instantiate a new yomama controller
 func MakeMamaController() *MamaController {
-    return &MamaController{}
+	return &MamaController{}
 }
 
 func (c *MamaController) Dozens() string {
-    return dozens.RandomDozens()
+	return dozens.RandomDozens()
 }
 
-func (c *MamaController) PrepFiles(args []string) {
+func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	if len(args) < 1 {
 		return
 	}
 
 	myPath := args[0]
 
-	fmt.Println("Verifying files...\n")
+	ch <- "\nVerifying files...\n"
 
 	// Verify folder exists, contains .fasta, .qual and .oligo files
 	var fastqFileName, fastaFileName, qualFileName, oligoFileName string
 
 	fastqfiles, err := filepath.Glob(myPath + "/*.fastq")
 	if err != nil || len(fastqfiles) != 1 {
-		fmt.Println("No fastq files found, checking for fasta and qual files...")
+		ch <- "No fastq files found, checking for fasta and qual files...\n"
 
 		fastafiles, err := filepath.Glob(myPath + "/*.fasta")
 		if err != nil || len(fastafiles) != 1 {
-			fmt.Println("PrepFiles: locating fasta file failed")
-			fmt.Println(err)
+			ch <- "PrepFiles: locating fasta file failed"
+			ch <- err.Error()
 			return
 		}
 		qualfiles, err := filepath.Glob(myPath + "/*.qual")
 		if err != nil || len(qualfiles) != 1 {
-			fmt.Println("PrepFiles: locating qual file failed")
-			fmt.Println(err)
+			ch <- "PrepFiles: locating qual file failed"
+			ch <- err.Error()
 			return
 		}
 
@@ -63,8 +63,8 @@ func (c *MamaController) PrepFiles(args []string) {
 
 	oligofiles, err := filepath.Glob(myPath + "/*.oligo")
 	if err != nil || len(oligofiles) != 1 {
-		fmt.Println("PrepFiles: locating oligo file failed")
-		fmt.Println(err)
+		ch <- "PrepFiles: locating oligo file failed"
+		ch <- err.Error()
 		return
 	} else {
 		oligoFileName = oligofiles[0]
@@ -75,8 +75,8 @@ func (c *MamaController) PrepFiles(args []string) {
 	if fastqFileName != "" {
 		fastqfile, err := os.Open(fastqFileName)
 		if err != nil {
-			fmt.Println("PrepFiles: fastq open failed")
-			fmt.Println(err)
+			ch <- "PrepFiles: fastq open failed"
+			ch <- err.Error()
 			return
 		}
 
@@ -84,8 +84,8 @@ func (c *MamaController) PrepFiles(args []string) {
 	} else if fastaFileName != "" && qualFileName != "" {
 		fastafile, err := os.Open(fastaFileName)
 		if err != nil {
-			fmt.Println("PrepFiles: fasta open failed")
-			fmt.Println(err)
+			ch <- "PrepFiles: fasta open failed"
+			ch <- err.Error()
 			return
 		}
 		qualfile, err := os.Open(qualFileName)
@@ -96,7 +96,6 @@ func (c *MamaController) PrepFiles(args []string) {
 		// Make FastaQualReader, SeqSorter
 		seqReader = fastaqual.NewFastaQualReader(fastafile, qualfile)
 	}
-
 
 	if err != nil {
 		return
@@ -117,7 +116,7 @@ func (c *MamaController) PrepFiles(args []string) {
 	// Track where sorting fails and why
 	errorsMap := make(map[string]int)
 
-	fmt.Println("Reading in sequences...")
+	ch <- "Reading in sequences..."
 
 	for seqReader.HasNext() {
 		seq := seqReader.Next()
@@ -132,22 +131,23 @@ func (c *MamaController) PrepFiles(args []string) {
 		}
 		err = store.AddSeq(sortedseq)
 		if err != nil {
-			fmt.Println("PrepFiles: error storing seq--")
-			fmt.Println(sortedseq.ToString())
+			ch <- "PrepFiles: error storing seq--"
+			ch <- sortedseq.ToString()
 		}
 	}
-	fmt.Println("...done.\n")
-	fmt.Println("Error summary:")
-	fmt.Println("Type of error\tCount")
+	ch <- "...done.\n"
+	ch <- "Error summary:"
+	ch <- "Type of error\tCount"
 	for k, v := range errorsMap {
-		fmt.Printf("%s\t%d\n", k, v)
+		ch <- k + "\t" + strconv.Itoa(v) + "\n"
 	}
+	ch <- "END"
 }
 
 func (c *MamaController) System(args []string) string {
-        out, err := exec.Command(args[0], args[1:]...).Output()
-	    if err != nil {
-		    log.Fatal(err)
-	    }
+	out, err := exec.Command(args[0], args[1:]...).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
 	return string(out)
 }
