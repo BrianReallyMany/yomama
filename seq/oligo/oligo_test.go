@@ -39,7 +39,8 @@ func TestValidateOligoTextFalse(t *testing.T) {
 
 func TestCountLinkers(t *testing.T) {
 	text := getFakeOligoText()
-	if numLinkers := CountLinkers(text); numLinkers != 1 {
+	buffer := bufio.NewReader(strings.NewReader(text))
+	if numLinkers := CountLinkers(buffer); numLinkers != 1 {
 		t.Errorf("ValidateOligoText returned numLinkers = %d, expected 1", numLinkers)
 	}
 }

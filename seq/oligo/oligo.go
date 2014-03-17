@@ -1,6 +1,7 @@
 package oligo
 
 import (
+	"io"
 	"bufio"
 	"fmt"
     	"strings"
@@ -14,13 +15,12 @@ func (e *OligoError) Error() string {
 	return fmt.Sprintf("oligo problem was %s", e.Problem)
 }
 
-func ValidateOligoText(reader *bufio.Reader) bool {
-	var err error
-	var line []byte
-	for ; err == nil; line, err = reader.ReadBytes('\n') {
-		sline := string(line)
-		if sline != "" {
-			ok := ValidateOligoLine(sline)
+func ValidateOligoText(reader io.Reader) bool {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != "" {
+			ok := ValidateOligoLine(line)
 			if !ok {
 				return false
 			}
@@ -29,10 +29,11 @@ func ValidateOligoText(reader *bufio.Reader) bool {
 	return true
 }
 
-func CountLinkers(input string) int {
-	lines := strings.Split(input, "\n")
+func CountLinkers(reader io.Reader) int {
+	scanner := bufio.NewScanner(reader)
 	numLinkers := 0
-	for _, line := range lines {
+	for scanner.Scan() {
+		line := scanner.Text()
 		if line != "" {
 			oligoType := OligoType(line)
 			if oligoType == "linker" {
