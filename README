@@ -1,0 +1,10 @@
+yomama is a console-based application for preparing and processing sequencing data.
+
+Preparing includes reading fastq or fasta/qual files, debarcoding, delinkering, deprimering and quality filtering.
+
+Processing includes calling SNPs, aligning and doing microsatellite or heteroplasmy analysis.
+
+A typical session involves the user setting configuration options, reading and preparing input files, and performing one of the above-mentioned "processing" steps. Interactive output is available on the screen, and output files can be written in standard formats (fasta, vcf, etc.).
+
+Configuration options and prepared reads persist between sessions. A saved command history and the ability to run scripts are desired additions.
+
