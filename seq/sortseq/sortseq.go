@@ -38,6 +38,7 @@ func NewSeqSorter(reader io.Reader, opts *SeqSorterOptions) (*SeqSorter, error) 
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)
 	linkers := make([][2]string, 0)
+	checkrev := opts.checkReverse
 
 	// Process oligo file line by line
 	scanner := bufio.NewScanner(reader)
@@ -66,8 +67,15 @@ func NewSeqSorter(reader io.Reader, opts *SeqSorterOptions) (*SeqSorter, error) 
 			oligoSeqs := [2]string{fields[1], fields[2]}
 			oligoID := fields[3]
 			primerMap[oligoSeqs] = oligoID
+			if checkrev {
+				oligoSeqs = [2]string{fields[2], fields[1]}
+				primerMap[oligoSeqs] = oligoID
+			}
 		case "linker":
 			linkers = append(linkers, [2]string{fields[1], fields[2]})
+			if checkrev {
+				linkers = append(linkers, [2]string{fields[2], fields[1]})
+			}
 		}
 	}
 	sorter := &SeqSorter{primerMap, barcodeMap, linkers, opts}

@@ -54,6 +54,42 @@ func TestNewSeqSorterValidInput(t *testing.T) {
 	}
 }
 
+func TestNewSeqSorterValidInputCheckReverse(t *testing.T) {
+	text := getOligoText()
+	buffer := bufio.NewReader(strings.NewReader(text))
+	opts := SeqSorterOptions{0, 0, 0, true}
+	sorter, _ := NewSeqSorter(buffer, &opts)
+	primerinput := [2]string{"GTGTAT", "ATCAAT"}
+	primeroutput := sorter.primerMap[primerinput]
+
+	if (primeroutput != "locus1") {
+		t.Errorf("OligoTextToMap returned a primerMap with m[%s] = %s, wanted 'locus1'", primerinput, primeroutput)
+	}
+	// Now test reverse of primers
+	primerinput = [2]string{"ATCAAT", "GTGTAT"}
+	primeroutput = sorter.primerMap[primerinput]
+
+	if (primeroutput != "locus1") {
+		t.Errorf("OligoTextToMap returned a primerMap with m[%s] = %s, wanted 'locus1'", primerinput, primeroutput)
+	}
+	barcodeinput := [2]string{"ATCGTACGTC", "TAGAATAAAC"}
+	barcodeoutput := sorter.barcodeMap[barcodeinput]
+	if (barcodeoutput != "sample1") {
+		t.Errorf("OligoTextToMap returned a barcodeMap with m[%s] = %s, wanted 'sample1'", barcodeinput, barcodeoutput)
+	}
+	linkerinput := [2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}
+	linkeroutput := sorter.linkers[0]
+	if (linkerinput != linkeroutput) {
+		t.Errorf("OligoTextToMap returned linkers with [0] = %s, wanted '%s'", linkeroutput, linkerinput)
+	}
+	// Now test reverse of linkers
+	linkerinput = [2]string{"GACTGTGGCAACACC", "TCGGCAGCGTCAGAT"}	
+	linkeroutput = sorter.linkers[1]
+	if (linkerinput != linkeroutput) {
+		t.Errorf("OligoTextToMap returned linkers with [0] = %s, wanted '%s'", linkeroutput, linkerinput)
+	}
+}
+
 func TestNewSeqSorterInvalidInput(t *testing.T) {
 	text := getInvalidOligoText()
 	buffer := bufio.NewReader(strings.NewReader(text))
