@@ -15,7 +15,7 @@ type SeqSorter struct {
 	primerMap map[[2]string]string
 	barcodeMap map[[2]string]string
 	linkers [][2]string
-	SeqSorterOptions
+	*SeqSorterOptions
 }
 
 type SeqSorterOptions struct {
@@ -34,7 +34,7 @@ func (e *SeqSorterError) Error() string {
 	return fmt.Sprintf("SeqSorter error occurred: %s", e.Problem)
 }
 
-func NewSeqSorter(reader io.Reader) (*SeqSorter, error) {
+func NewSeqSorter(reader io.Reader, opts *SeqSorterOptions) (*SeqSorter, error) {
 	primerMap := make(map[[2]string]string)
 	barcodeMap := make(map[[2]string]string)
 	linkers := make([][2]string, 0)
@@ -70,7 +70,7 @@ func NewSeqSorter(reader io.Reader) (*SeqSorter, error) {
 			linkers = append(linkers, [2]string{fields[1], fields[2]})
 		}
 	}
-	sorter := &SeqSorter{primerMap, barcodeMap, linkers, SeqSorterOptions{}}
+	sorter := &SeqSorter{primerMap, barcodeMap, linkers, opts}
 	return sorter, nil
 }
 

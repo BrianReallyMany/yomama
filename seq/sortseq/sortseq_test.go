@@ -29,13 +29,13 @@ func getSeqSorter() SeqSorter{
 		[2]string{"ATCGTACGTC", "TAGAATAAAC"}: "sample1",
 	}
 	var links = [][2]string{[2]string{"TCGGCAGCGTCAGAT", "GACTGTGGCAACACC"}}
-	return SeqSorter{priMap, barMap, links, SeqSorterOptions{}}
+	return SeqSorter{priMap, barMap, links, &SeqSorterOptions{}}
 }
 
 func TestNewSeqSorterValidInput(t *testing.T) {
 	text := getOligoText()
 	buffer := bufio.NewReader(strings.NewReader(text))
-	sorter, _ := NewSeqSorter(buffer)
+	sorter, _ := NewSeqSorter(buffer, &SeqSorterOptions{})
 	primerinput := [2]string{"GTGTAT", "ATCAAT"}
 	primeroutput := sorter.primerMap[primerinput]
 
@@ -57,7 +57,7 @@ func TestNewSeqSorterValidInput(t *testing.T) {
 func TestNewSeqSorterInvalidInput(t *testing.T) {
 	text := getInvalidOligoText()
 	buffer := bufio.NewReader(strings.NewReader(text))
-	_, err := NewSeqSorter(buffer)
+	_, err := NewSeqSorter(buffer, &SeqSorterOptions{})
 	if err == nil {
 		t.Errorf("NewSeqSorter failed to return error on invalid input, expected error.")
 	}
