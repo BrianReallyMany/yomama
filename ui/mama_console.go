@@ -2,8 +2,6 @@ package ui
 
 import (
     "fmt"
-    "log"
-    "os/exec"
 )
 
 // The yomama console class
@@ -37,27 +35,27 @@ func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
 	    // TODO default (unrecognized command) case
     case "":
 	    fmt.Println(c.Help())
+	    break
 
     case "help":
 	    fmt.Println(c.Help())
+	    break
 
     case "echo":
         fmt.Println(string(line))
         break
 
     case "system":
-        out, err := exec.Command(args[0], args[1:]...).Output()
-	    if err != nil {
-		    log.Fatal(err)
-	    }
-        fmt.Print(string(out))
+        fmt.Print(c.ctl.System(args))
         break
 
     case "yomama":
         fmt.Print(c.ctl.Dozens())
+	break
 
 	case "prepfiles":
 		c.ctl.PrepFiles(args)
+		break
 
     case "exit":
         return false

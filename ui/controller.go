@@ -5,7 +5,8 @@ import (
 	"os"
 	"fmt"
 	"path/filepath"
-	"io/ioutil"
+    	"log"
+    	"os/exec"
 	"github.com/BrianReallyMany/yomama/dozens"
 	"github.com/BrianReallyMany/yomama/seq/sortseq"
 	"github.com/BrianReallyMany/yomama/iomama"
@@ -35,7 +36,7 @@ func (c *MamaController) PrepFiles(args []string) {
 	fmt.Println("Verifying files...\n")
 
 	// Verify folder exists, contains .fasta, .qual and .oligo files
-	var fastqFileName, fastaFileName, qualFileName string
+	var fastqFileName, fastaFileName, qualFileName, oligoFileName string
 
 	fastqfiles, err := filepath.Glob(myPath + "/*.fastq")
 	if err != nil || len(fastqfiles) != 1 {
@@ -65,6 +66,8 @@ func (c *MamaController) PrepFiles(args []string) {
 		fmt.Println("PrepFiles: locating oligo file failed")
 		fmt.Println(err)
 		return
+	} else {
+		oligoFileName = oligofiles[0]
 	}
 
 	var seqReader iomama.SeqReader
@@ -95,12 +98,12 @@ func (c *MamaController) PrepFiles(args []string) {
 	}
 
 
-	oligostring, err := ioutil.ReadFile(oligofiles[0])
 	if err != nil {
 		return
 	}
-	sorter, err := sortseq.NewSeqSorter(string(oligostring)) // takes string representation of oligo file!
-	// TODO consistent io handling for sortseq!
+
+	oligofile, err := os.Open(oligoFileName)
+	sorter, err := sortseq.NewSeqSorter(oligofile)
 	if err != nil {
 		return
 	}
@@ -139,4 +142,12 @@ func (c *MamaController) PrepFiles(args []string) {
 	for k, v := range errorsMap {
 		fmt.Printf("%s\t%d\n", k, v)
 	}
+}
+
+func (c *MamaController) System(args []string) string {
+        out, err := exec.Command(args[0], args[1:]...).Output()
+	    if err != nil {
+		    log.Fatal(err)
+	    }
+	return string(out)
 }
