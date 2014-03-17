@@ -1,4 +1,4 @@
-package iomama
+package fastaqual
 
 import (
     "strings"

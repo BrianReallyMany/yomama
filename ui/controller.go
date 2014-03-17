@@ -9,6 +9,7 @@ import (
 	"github.com/BrianReallyMany/yomama/dozens"
 	"github.com/BrianReallyMany/yomama/seq/sortseq"
 	"github.com/BrianReallyMany/yomama/iomama"
+	"github.com/BrianReallyMany/yomama/iomama/fastaqual"
 	"github.com/BrianReallyMany/yomama/iomama/fastq"
 )
 
@@ -90,7 +91,7 @@ func (c *MamaController) PrepFiles(args []string) {
 		}
 
 		// Make FastaQualReader, SeqSorter
-		seqReader = iomama.NewFastaQualReader(fastafile, qualfile)
+		seqReader = fastaqual.NewFastaQualReader(fastafile, qualfile)
 	}
 
 

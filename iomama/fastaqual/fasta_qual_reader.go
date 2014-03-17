@@ -1,17 +1,12 @@
-package iomama
+package fastaqual
 
 import (
     "bufio"
     "io"
-    "github.com/BrianReallyMany/yomama/iomama/fasta"
-    "github.com/BrianReallyMany/yomama/iomama/qual"
+    "github.com/BrianReallyMany/yomama/iomama/fastaqual/fasta"
+    "github.com/BrianReallyMany/yomama/iomama/fastaqual/qual"
     . "github.com/BrianReallyMany/yomama/seq"
 )
-
-type SeqReader interface {
-    HasNext() bool
-    Next() Seq
-}
 
 type FastaQualReader struct {
     freader *fasta.FastaReader
