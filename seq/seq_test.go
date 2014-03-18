@@ -52,3 +52,19 @@ func TestTrimEndsError(t *testing.T) {
 		t.Errorf("TrimEnds did not return an error; it should have.")
 	}
 }
+
+func TestAvgScore(t *testing.T) {
+	seq := makeTestSeq()
+	score := seq.AvgScore()
+	if score != 30 {
+		t.Errorf("seq.AvgScore returned %v, expected 30", score)
+	}
+}
+
+func TestScoresAsSliceOfInts(t *testing.T) {
+	seq := makeTestSeq()
+	scoreslice := seq.ScoresAsSliceOfInts()
+	if len(scoreslice) != 3 {
+		t.Errorf("seq.ScoresAsSliceOfInts returned slice of length %d, expected 3", len(scoreslice))
+	}
+}

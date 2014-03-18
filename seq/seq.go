@@ -39,3 +39,26 @@ func (s *Seq) TrimEnds(fromBegin, fromEnd int) error {
 	s.Scores = strings.Join(scoreSlice, " ")
 	return nil
 }
+
+func (s *Seq) AvgScore() float32 {
+	scoreslice := s.ScoresAsSliceOfInts()
+	total := 0
+	for _, score := range scoreslice {
+		total += score
+	}
+	return float32(total) / float32(len(scoreslice))
+}
+
+func (s *Seq) ScoresAsSliceOfInts() []int {
+	scoreslice := make([]int, len(s.Bases))
+	splitscores := strings.Split(s.Scores, " ")
+	for i, score := range splitscores {
+		intscore, err := strconv.Atoi(score)
+		if err != nil {
+			return scoreslice
+		}
+		scoreslice[i] = intscore
+	}
+	return scoreslice
+}
+

@@ -81,3 +81,4 @@ func ReverseComplement(seq string) string {
 	reversed := Reverse(seq)
 	return Complement(reversed)
 }
+
