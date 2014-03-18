@@ -24,6 +24,40 @@ func getLousySeq() Seq {
 	return Seq{"foo_seq", "GATTACA", "5 7 9 11 13 11 7", "", "", false}
 }
 
+func TestSeqPassesMinLength(t *testing.T) {
+	opts := &SeqFilterOptions{}
+	opts.MinLength = 7
+	seq := getLousySeq()
+	ok := SeqPasses(seq, opts)
+	// Seq is length 7, should pass
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	opts.MinLength = 8
+	ok = SeqPasses(seq, opts)
+	// Should fail now
+	if ok {
+		t.Errorf("SeqPasses returned true, expected false")
+	}
+}
+
+func TestSeqPassesMaxLength(t *testing.T) {
+	opts := &SeqFilterOptions{}
+	opts.MaxLength = 7
+	seq := getLousySeq()
+	ok := SeqPasses(seq, opts)
+	// Seq is length 7, should pass
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	opts.MaxLength = 6
+	ok = SeqPasses(seq, opts)
+	// Should fail now
+	if ok {
+		t.Errorf("SeqPasses returned true, expected false")
+	}
+}
+
 func TestSeqPassesAvgVal(t *testing.T) {
 	opts := getAvgValueTestFilterOptions()
 	seq := getLousySeq()

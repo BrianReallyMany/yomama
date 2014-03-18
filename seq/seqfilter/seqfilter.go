@@ -6,6 +6,8 @@ import (
 )
 
 type SeqFilterOptions struct {
+	MinLength int
+	MaxLength int	// zero-value implies no filter will be applied
 	AvgVal bool
 	MinAvgVal float32
 	SlidingWin bool
@@ -28,6 +30,18 @@ func (e *SeqFilterError) Error() string {
 
 func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
 	var pass bool
+	if opts.MinLength != 0 {
+		pass = minLengthTest(seq, opts)
+		if !pass {
+			return false
+		}
+	}
+	if opts.MaxLength != 0 {
+		pass = maxLengthTest(seq, opts)
+		if !pass {
+			return false
+		}
+	}
 	if opts.AvgVal {
 		pass = avgValueTest(seq, opts)
 		if !pass {
@@ -51,6 +65,20 @@ func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
 		if !pass {
 			return false
 		}
+	}
+	return true
+}
+
+func minLengthTest(seq Seq, opts *SeqFilterOptions) bool {
+	if len(seq.Bases) < opts.MinLength {
+		return false
+	}
+	return true
+}
+
+func maxLengthTest(seq Seq, opts *SeqFilterOptions) bool {
+	if len(seq.Bases) > opts.MaxLength {
+		return false
 	}
 	return true
 }
