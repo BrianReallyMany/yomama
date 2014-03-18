@@ -90,3 +90,27 @@ func TestSeqPassesNumberOfNs(t *testing.T) {
 	}
 
 }
+
+func TestSeqPassesHomopolymerRun(t *testing.T) {
+	opts := &SeqFilterOptions{}
+	opts.HomopolymerRun = true
+	opts.MaxHomopolymerRun = 3
+	seq := getLousySeq()
+	ok := SeqPasses(seq, opts)
+	// seq.Bases = "GATTACA", so should pass
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	seq.Bases = "GATTTCA"
+	// 3 Ts in a row, should still pass
+	ok = SeqPasses(seq, opts)
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	seq.Bases = "GATTTTA"
+	// 4 Ts, should fail now
+	ok = SeqPasses(seq, opts)
+	if ok {
+		t.Errorf("SeqPasses returned true, expected false")
+	}
+}

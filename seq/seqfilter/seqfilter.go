@@ -46,6 +46,12 @@ func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
 			return false
 		}
 	}
+	if opts.HomopolymerRun {
+		pass = homopolymerRunTest(seq, opts)
+		if !pass {
+			return false
+		}
+	}
 	return true
 }
 
@@ -81,6 +87,24 @@ func numberOfNsTest(seq Seq, opts *SeqFilterOptions) bool {
 	}
 	if count > opts.MaxNumberOfNs {
 		return false
+	}
+	return true
+}
+
+func homopolymerRunTest(seq Seq, opts *SeqFilterOptions) bool {
+	run := 1
+	lastbase := byte('*')
+	bases := []byte(seq.Bases)
+	for _, base := range bases {
+		if base == lastbase {
+			run++
+			if run > opts.MaxHomopolymerRun {
+				return false
+			}
+		} else {
+			run = 1
+			lastbase = base
+		}
 	}
 	return true
 }
