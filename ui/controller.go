@@ -102,7 +102,8 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	}
 
 	oligofile, err := os.Open(oligoFileName)
-	sorter, err := sortseq.NewSeqSorter(oligofile)
+	temporaryDefaultSeqSorterOptions := sortseq.NewSeqSorterOptions(0, 0, 0, true)
+	sorter, err := sortseq.NewSeqSorter(oligofile, temporaryDefaultSeqSorterOptions)
 	if err != nil {
 		return
 	}

@@ -25,6 +25,10 @@ type SeqSorterOptions struct {
 	checkReverse bool
 }
 
+func NewSeqSorterOptions (b, l, p int, checkR bool) *SeqSorterOptions {
+	return &SeqSorterOptions{b, l, p, checkR}
+}
+
 type SeqSorterError struct {
 	Problem string
 	Where string
