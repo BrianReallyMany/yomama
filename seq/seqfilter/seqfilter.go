@@ -52,7 +52,16 @@ func avgValueTest(seq Seq, opts *SeqFilterOptions) bool {
 }
 
 func slidingWindowTest(seq Seq, opts *SeqFilterOptions) bool {
-	//scoreslice := seq.ScoresAsSliceOfInts()
+	length := len(seq.Bases)
+	winSize := opts.SlidingWinSize
+	minScore := float32(opts.SlidingWinMinScore)
+	scoreslice := seq.ScoresAsSliceOfInts()
+	for i := 0; i < length - winSize + 1; i++ {
+		avg := avgValOfSlice(scoreslice[i:i+winSize])
+		if avg < minScore {
+			return false
+		}
+	}
 	return true
 }
 

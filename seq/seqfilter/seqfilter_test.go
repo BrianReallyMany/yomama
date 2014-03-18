@@ -42,8 +42,15 @@ func TestSeqPassesSlidingWindow(t *testing.T) {
 	opts := getSlidingWindowTestFilterOptions()
 	seq := getLousySeq()
 	ok := SeqPasses(seq, opts)
+	// Should pass with window size of 4
 	if !ok {
 		t.Errorf("SeqPasses returned false; expected true")
+	}
+	// Should fail with window size of 3
+	opts.SlidingWinSize = 3
+	ok = SeqPasses(seq, opts)
+	if ok {
+		t.Errorf("SeqPasses returned true; expected false")
 	}
 }
 
@@ -52,5 +59,9 @@ func TestAvgValOfSlice(t *testing.T) {
 	avg1 := avgValOfSlice(testslice1)
 	if avg1 != 5.5 {
 		t.Errorf("avgValOfSlice returned %v; expected 5.5", avg1)
+	}
+	avg2 := avgValOfSlice(testslice1[1:])
+	if avg2 != 6.0 {
+		t.Errorf("avgValOfSlice returned %v; expected 6.0", avg2)
 	}
 }
