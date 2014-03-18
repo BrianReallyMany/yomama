@@ -40,6 +40,12 @@ func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
 			return false
 		}
 	}
+	if opts.NumberOfNs {
+		pass = numberOfNsTest(seq, opts)
+		if !pass {
+			return false
+		}
+	}
 	return true
 }
 
@@ -61,6 +67,20 @@ func slidingWindowTest(seq Seq, opts *SeqFilterOptions) bool {
 		if avg < minScore {
 			return false
 		}
+	}
+	return true
+}
+
+func numberOfNsTest(seq Seq, opts *SeqFilterOptions) bool {
+	count := 0
+	bases := []byte(seq.Bases)
+	for _, base := range bases {
+		if base == 'N' || base == 'n' {
+			count++
+		}
+	}
+	if count > opts.MaxNumberOfNs {
+		return false
 	}
 	return true
 }

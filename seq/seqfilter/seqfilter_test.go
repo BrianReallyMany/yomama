@@ -65,3 +65,28 @@ func TestAvgValOfSlice(t *testing.T) {
 		t.Errorf("avgValOfSlice returned %v; expected 6.0", avg2)
 	}
 }
+
+func TestSeqPassesNumberOfNs(t *testing.T) {
+	opts := &SeqFilterOptions{}
+	opts.NumberOfNs = true
+	opts.MaxNumberOfNs = 3
+	seq := getLousySeq()
+	ok := SeqPasses(seq, opts)
+	// No Ns at all, should pass
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	seq.Bases = "GATTNNN"
+	ok = SeqPasses(seq, opts)
+	// 3 Ns, should still pass
+	if !ok {
+		t.Errorf("SeqPasses returned false, expected true")
+	}
+	seq.Bases = "GATNNNN"
+	ok = SeqPasses(seq, opts)
+	// 4 Ns, should fail
+	if ok {
+		t.Errorf("SeqPasses returned true, expected false")
+	}
+
+}
