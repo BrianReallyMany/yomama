@@ -27,8 +27,15 @@ func (e *SeqFilterError) Error() string {
 }
 
 func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
+	var pass bool
 	if opts.AvgVal {
-		pass := avgValueTest(seq, opts)
+		pass = avgValueTest(seq, opts)
+		if !pass {
+			return false
+		}
+	} 
+	if opts.SlidingWin {
+		pass = slidingWindowTest(seq, opts)
 		if !pass {
 			return false
 		}
@@ -42,4 +49,17 @@ func avgValueTest(seq Seq, opts *SeqFilterOptions) bool {
 		return true
 	}
 	return false
+}
+
+func slidingWindowTest(seq Seq, opts *SeqFilterOptions) bool {
+	//scoreslice := seq.ScoresAsSliceOfInts()
+	return true
+}
+
+func avgValOfSlice(sl []int) float32 {
+	total := 0
+	for _, score := range sl {
+		total += score
+	}
+	return float32(total) / float32(len(sl))
 }
