@@ -54,11 +54,11 @@ func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
 		break
 
 	case "prepfiles":
-		channel := make(chan string, 100)
-		c.ctl.PrepFiles(args, channel)
+		channel := make(chan string)
+		go c.ctl.PrepFiles(args, channel)
 		for {
-			output := <- channel
-			if output == "END" {
+			output, more := <- channel
+			if !more {
 				break
 			}
 			fmt.Println(output)

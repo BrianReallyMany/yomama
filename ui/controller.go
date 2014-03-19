@@ -27,6 +27,8 @@ func (c *MamaController) Dozens() string {
 }
 
 func (c *MamaController) PrepFiles(args []string, ch chan string) {
+	defer close(ch)
+
 	if len(args) < 1 {
 		return
 	}
@@ -142,7 +144,6 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	for k, v := range errorsMap {
 		ch <- k + "\t" + strconv.Itoa(v) + "\n"
 	}
-	ch <- "END"
 }
 
 func (c *MamaController) System(args []string) string {
