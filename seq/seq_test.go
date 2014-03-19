@@ -64,7 +64,7 @@ func TestAvgScore(t *testing.T) {
 func TestScoresAsSliceOfInts(t *testing.T) {
 	seq := makeTestSeq()
 	scoreslice := seq.ScoresAsSliceOfInts()
-	if len(scoreslice) != 3 {
+	if len(scoreslice) != 7 {
 		t.Errorf("seq.ScoresAsSliceOfInts returned slice of length %d, expected 3", len(scoreslice))
 	}
 }

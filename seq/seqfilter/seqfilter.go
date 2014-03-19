@@ -6,8 +6,10 @@ import (
 )
 
 type SeqFilterOptions struct {
-	MinLength int
-	MaxLength int	// zero-value implies no filter will be applied
+	MinLength bool
+	MinLengthValue int
+	MaxLength bool
+	MaxLengthValue int
 	AvgVal bool
 	MinAvgVal float32
 	SlidingWin bool
@@ -28,15 +30,15 @@ func (e *SeqFilterError) Error() string {
 	return fmt.Sprintf("SeqFilter error occurred. Filter=%s, Problem=%s", e.Filter, e.Problem)
 }
 
-func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
+func SeqPasses(seq *Seq, opts *SeqFilterOptions) bool {
 	var pass bool
-	if opts.MinLength != 0 {
+	if opts.MinLength {
 		pass = minLengthTest(seq, opts)
 		if !pass {
 			return false
 		}
 	}
-	if opts.MaxLength != 0 {
+	if opts.MaxLength {
 		pass = maxLengthTest(seq, opts)
 		if !pass {
 			return false
@@ -69,21 +71,21 @@ func SeqPasses(seq Seq, opts *SeqFilterOptions) bool {
 	return true
 }
 
-func minLengthTest(seq Seq, opts *SeqFilterOptions) bool {
-	if len(seq.Bases) < opts.MinLength {
+func minLengthTest(seq *Seq, opts *SeqFilterOptions) bool {
+	if len(seq.Bases) < opts.MinLengthValue {
 		return false
 	}
 	return true
 }
 
-func maxLengthTest(seq Seq, opts *SeqFilterOptions) bool {
-	if len(seq.Bases) > opts.MaxLength {
+func maxLengthTest(seq *Seq, opts *SeqFilterOptions) bool {
+	if len(seq.Bases) > opts.MaxLengthValue {
 		return false
 	}
 	return true
 }
 
-func avgValueTest(seq Seq, opts *SeqFilterOptions) bool {
+func avgValueTest(seq *Seq, opts *SeqFilterOptions) bool {
 	avg := seq.AvgScore()
 	if avg >= opts.MinAvgVal {
 		return true
@@ -91,7 +93,7 @@ func avgValueTest(seq Seq, opts *SeqFilterOptions) bool {
 	return false
 }
 
-func slidingWindowTest(seq Seq, opts *SeqFilterOptions) bool {
+func slidingWindowTest(seq *Seq, opts *SeqFilterOptions) bool {
 	length := len(seq.Bases)
 	winSize := opts.SlidingWinSize
 	minScore := float32(opts.SlidingWinMinScore)
@@ -105,7 +107,7 @@ func slidingWindowTest(seq Seq, opts *SeqFilterOptions) bool {
 	return true
 }
 
-func numberOfNsTest(seq Seq, opts *SeqFilterOptions) bool {
+func numberOfNsTest(seq *Seq, opts *SeqFilterOptions) bool {
 	count := 0
 	bases := []byte(seq.Bases)
 	for _, base := range bases {
@@ -119,7 +121,7 @@ func numberOfNsTest(seq Seq, opts *SeqFilterOptions) bool {
 	return true
 }
 
-func homopolymerRunTest(seq Seq, opts *SeqFilterOptions) bool {
+func homopolymerRunTest(seq *Seq, opts *SeqFilterOptions) bool {
 	run := 1
 	lastbase := byte('*')
 	bases := []byte(seq.Bases)
