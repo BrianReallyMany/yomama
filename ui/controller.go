@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"strconv"
 	"log"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -36,40 +37,32 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	myPath := args[0]
 
 	ch <- "\nVerifying files...\n"
-
-	// Verify folder exists, contains .fasta, .qual and .oligo files
-	var fastqFileName, fastaFileName, qualFileName, oligoFileName string
-
-	fastqfiles, err := filepath.Glob(myPath + "/*.fastq")
-	if err != nil || len(fastqfiles) != 1 {
-		ch <- "No fastq files found, checking for fasta and qual files...\n"
-
-		fastafiles, err := filepath.Glob(myPath + "/*.fasta")
-		if err != nil || len(fastafiles) != 1 {
-			ch <- "PrepFiles: locating fasta file failed"
-			ch <- err.Error()
-			return
-		}
-		qualfiles, err := filepath.Glob(myPath + "/*.qual")
-		if err != nil || len(qualfiles) != 1 {
-			ch <- "PrepFiles: locating qual file failed"
-			ch <- err.Error()
-			return
-		}
-
-		fastaFileName = fastafiles[0]
-		qualFileName = qualfiles[0]
-	} else {
-		fastqFileName = fastqfiles[0]
-	}
-
-	oligofiles, err := filepath.Glob(myPath + "/*.oligo")
-	if err != nil || len(oligofiles) != 1 {
-		ch <- "PrepFiles: locating oligo file failed"
+	var fastaFileName, qualFileName string
+	fastqFileName, err := getFileByExtension(myPath, "fastq")
+	if err != nil {
 		ch <- err.Error()
+		ch <- "Fastq search failed, checking for fasta and qual files...\n"
+
+		fastaFileName, err = getFileByExtension(myPath, "fasta")
+		if err != nil {
+			ch <- err.Error()
+			ch <- "Fasta search failed, exiting now.\n"
+			return
+		}
+
+		qualFileName, err = getFileByExtension(myPath, "qual")
+		if err != nil {
+			ch <- err.Error()
+			ch <- "Qual search failed, exiting now.\n"
+			return
+		}
+	} 
+
+	oligoFileName, err := getFileByExtension(myPath, "oligo")
+	if err != nil {
+		ch <- err.Error()
+		ch <- "Oligo search failed, exiting now.\n"
 		return
-	} else {
-		oligoFileName = oligofiles[0]
 	}
 
 	var seqReader iomama.SeqReader
@@ -99,11 +92,9 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 		seqReader = fastaqual.NewFastaQualReader(fastafile, qualfile)
 	}
 
-	if err != nil {
-		return
-	}
-
 	oligofile, err := os.Open(oligoFileName)
+	// TODO this is a hack to hold things together until options module is complete
+	// then PrepFiles should receive a *SeqSorterOptions as an argument.
 	temporaryDefaultSeqSorterOptions := sortseq.NewSeqSorterOptions(0, 0, 0, true)
 	sorter, err := sortseq.NewSeqSorter(oligofile, temporaryDefaultSeqSorterOptions)
 	if err != nil {
@@ -153,3 +144,15 @@ func (c *MamaController) System(args []string) string {
 	}
 	return string(out)
 }
+
+func getFileByExtension(path, extension string) (string, error) {
+	files, err := filepath.Glob(path + "/*." + extension)
+	if err != nil {
+		return "", err
+	}
+	if len(files) != 1 {
+		return "", errors.New("Multiple files found with extension ." + extension)
+	}
+	return files[0], nil
+}
+
