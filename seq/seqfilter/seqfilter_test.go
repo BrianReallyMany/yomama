@@ -21,7 +21,7 @@ func getSlidingWindowTestFilterOptions() *SeqFilterOptions {
 }
 
 func getLousySeq() *Seq {
-	return &Seq{"foo_seq", "GATTACA", "5 7 9 11 13 11 7", "", "", false}
+	return &Seq{"foo_seq", "GATTACA", []int{5, 7, 9, 11, 13, 11, 7}, "", "", false}
 }
 
 func TestSeqPassesMinLength(t *testing.T) {
