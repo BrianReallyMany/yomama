@@ -5,7 +5,7 @@ import "testing"
 func makeTestSeq() Seq {
 	header := "foo_seq"
 	bases := "GATTACA"
-	scores := "30 30 30 30 30 30 30"
+	scores := []int{30, 30, 30, 30, 30, 30, 30}
 	locus := "locus1"
 	sample := "sample1"
 	reverse := false
@@ -40,8 +40,10 @@ func TestTrimEnds(t *testing.T) {
 	if seq.Bases != "TTA" {
 		t.Errorf("TrimEnds returned bases = %s, expected 'TTA'", seq.Bases)
 	}
-	if seq.Scores != "30 30 30" {
-		t.Errorf("TrimEnds returned scores = %s, expected '30 30 30'", seq.Scores)
+	for _, score := range seq.Scores {
+		if score != 30 {
+			t.Errorf("TrimEnds returned scores = %s, expected '30 30 30'", seq.Scores)
+		}
 	}
 }
 
@@ -61,10 +63,3 @@ func TestAvgScore(t *testing.T) {
 	}
 }
 
-func TestScoresAsSliceOfInts(t *testing.T) {
-	seq := makeTestSeq()
-	scoreslice := seq.ScoresAsSliceOfInts()
-	if len(scoreslice) != 7 {
-		t.Errorf("seq.ScoresAsSliceOfInts returned slice of length %d, expected 3", len(scoreslice))
-	}
-}

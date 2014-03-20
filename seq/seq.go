@@ -9,7 +9,7 @@ import (
 type Seq struct {
 	Header  string
 	Bases   string
-	Scores  string
+	Scores  []int
 	Locus   string
 	Sample  string
 	Reverse bool
@@ -18,7 +18,7 @@ type Seq struct {
 func (s *Seq) ToString() string {
 	result := "Header: " + s.Header + "\n"
 	result += "Bases: " + s.Bases + "\n"
-	result += "Scores: " + s.Scores + "\n"
+	result += "Scores: " + s.ScoresToString() + "\n"
 	result += "Locus: " + s.Locus + "\n"
 	result += "Sample: " + s.Sample + "\n"
 	result += "Reverse: " + strconv.FormatBool(s.Reverse)
@@ -34,31 +34,22 @@ func (s *Seq) TrimEnds(fromBegin, fromEnd int) error {
 	allBases := []byte(s.Bases)
 	s.Bases = string(allBases[fromBegin:len(s.Bases)-fromEnd])
 	// Trim Scores
-	allScores := strings.Split(s.Scores, " ")
-	scoreSlice := allScores[fromBegin:len(allScores)-fromEnd]
-	s.Scores = strings.Join(scoreSlice, " ")
+	s.Scores = s.Scores[fromBegin:len(s.Scores)-fromEnd] 
 	return nil
 }
 
 func (s *Seq) AvgScore() float32 {
-	scoreslice := s.ScoresAsSliceOfInts()
 	total := 0
-	for _, score := range scoreslice {
+	for _, score := range s.Scores {
 		total += score
 	}
-	return float32(total) / float32(len(scoreslice))
+	return float32(total) / float32(len(s.Scores))
 }
 
-func (s *Seq) ScoresAsSliceOfInts() []int {
-	scoreslice := make([]int, len(s.Bases))
-	splitscores := strings.Split(s.Scores, " ")
-	for i, score := range splitscores {
-		intscore, err := strconv.Atoi(score)
-		if err != nil {
-			return scoreslice
-		}
-		scoreslice[i] = intscore
+func (s *Seq) ScoresToString() string {
+	scorestring := ""
+	for _, score := range s.Scores {
+		scorestring += strconv.Itoa(score) + " "
 	}
-	return scoreslice
+	return strings.Trim(scorestring, " ")
 }
-
