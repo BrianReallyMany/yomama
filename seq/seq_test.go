@@ -63,3 +63,10 @@ func TestAvgScore(t *testing.T) {
 	}
 }
 
+func TestScoresToString(t *testing.T) {
+	seq := makeTestSeq()
+	result := seq.ScoresToString()
+	if result != "30 30 30 30 30 30 30" {
+		t.Errorf("seq.ScoresToString returned %s; expected '30 30 30 30 30 30 30'")
+	}
+}

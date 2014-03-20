@@ -99,3 +99,15 @@ func QualStringToIntSlice(quals string) []int {
 	}
 	return scoreslice
 }
+
+func StringToPhredScoreSlice(scores string, phred64 bool) []int{
+	result := make([]int, len(scores))
+	for i, char := range scores {
+		if phred64 {
+			result[i] = int(char)-64
+		} else {
+			result[i] = int(char)-33
+		}
+	}
+	return result
+}

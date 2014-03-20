@@ -109,3 +109,28 @@ func TestQualStringToIntSlice(t *testing.T) {
 		}
 	}
 }
+
+func TestStringToPhredScoreSlice(t *testing.T) {
+	string1 := "A"
+	scoreslice1phred33 := StringToPhredScoreSlice(string1, false)
+	if scoreslice1phred33[0] != 32 {
+		t.Errorf("StringToPhredScoreSlice returned %d, expected 32", scoreslice1phred33[0])
+	}
+	string2 := "!\"#$%&'()*+,-./0"
+	expected2 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
+	scoreslice2phred33 := StringToPhredScoreSlice(string2, false)
+	for i, score := range scoreslice2phred33 {
+		if score != expected2[i] {
+			t.Errorf("StringToPhredScoreSlice returned %d, expected %d", score, expected2[i])
+		}
+	}
+	string3 := "@Jh"
+	expected3 := []int{0, 10, 40}
+	scoreslice3phred64 := StringToPhredScoreSlice(string3, true)
+	for i, score := range scoreslice3phred64 {
+		if score != expected3[i] {
+			t.Errorf("StringToPhredScoreSlice returned %d, expected %d", score, expected3[i])
+		}
+	}
+}
+
