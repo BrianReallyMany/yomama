@@ -6,6 +6,7 @@ import (
     "github.com/BrianReallyMany/yomama/iomama/fastaqual/fasta"
     "github.com/BrianReallyMany/yomama/iomama/fastaqual/qual"
     . "github.com/BrianReallyMany/yomama/seq"
+    "github.com/BrianReallyMany/yomama/seq/sequtil"
 )
 
 type FastaQualReader struct {
@@ -42,6 +43,8 @@ func (fq *FastaQualReader) HasNext() bool {
 }
 
 func (fq *FastaQualReader) Next() Seq {
-	return Seq{fq.fseq.Header, fq.fseq.Seq, fq.qseq.Qual, "", "", false}
+	// QualSeq.Qual is a string! Need a []int
+	scores := sequtil.QualStringToIntSlice(fq.qseq.Qual)
+	return Seq{fq.fseq.Header, fq.fseq.Seq, scores, "", "", false}
 }
 

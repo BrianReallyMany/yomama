@@ -21,9 +21,9 @@ func TestReadFastaQual(t *testing.T) {
 				seq Seq
 				pass bool
 			} {
-		{Seq{"seq1", "ATGCT", "20 30 30 30 20", "", "", false}, false},
-		{Seq{"seq2", "ATGCG", "30 35 35 35 40", "", "", false}, false},
-		{Seq{"seq3", "ATGCA", "40 40 40 40 20", "", "", false}, false},
+		{Seq{"seq1", "ATGCT", []int{20, 30, 30, 30, 20}, "", "", false}, false},
+		{Seq{"seq2", "ATGCG", []int{30, 35, 35, 35, 40}, "", "", false}, false},
+		{Seq{"seq3", "ATGCA", []int{40, 40, 40, 40, 20}, "", "", false}, false},
 	}
 	i := 0
 	for fqreader.HasNext() {
@@ -35,8 +35,10 @@ func TestReadFastaQual(t *testing.T) {
 		if seq.Bases != testSeqs[i].seq.Bases {
 			t.Errorf("FastaQual reader returned seq with bases %s; expected %s", seq.Bases, testSeqs[i].seq.Bases)
 		}
-		if seq.Scores != testSeqs[i].seq.Scores {
-			t.Errorf("FastaQual reader returned seq with scores %s; expected %s", seq.Scores, testSeqs[i].seq.Scores)
+		for j, score := range seq.Scores {
+			if score != testSeqs[i].seq.Scores[j] {
+				t.Fail()
+			}
 		}
 		i++
 	}
