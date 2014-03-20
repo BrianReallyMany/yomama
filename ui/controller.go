@@ -56,6 +56,7 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 			ch <- "Qual search failed, exiting now.\n"
 			return
 		}
+		ch <- "Fasta and Qual files found!\n"
 	} 
 
 	oligoFileName, err := getFileByExtension(myPath, "oligo")
@@ -150,7 +151,9 @@ func getFileByExtension(path, extension string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(files) != 1 {
+	if len(files) == 0 {
+		return "", errors.New("No files found with extension ." + extension)
+	} else if len(files) > 1 {
 		return "", errors.New("Multiple files found with extension ." + extension)
 	}
 	return files[0], nil

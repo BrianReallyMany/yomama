@@ -76,9 +76,16 @@ func NewSeqSorter(reader io.Reader, opts *SeqSorterOptions) (*SeqSorter, error) 
 				primerMap[oligoSeqs] = oligoID
 			}
 		case "linker":
-			linkers = append(linkers, [2]string{fields[1], fields[2]})
-			if checkrev {
-				linkers = append(linkers, [2]string{fields[2], fields[1]})
+			if len(fields) == 3 {
+				linkers = append(linkers, [2]string{fields[1], fields[2]})
+				if checkrev {
+					linkers = append(linkers, [2]string{fields[2], fields[1]})
+				}
+			} else {
+				linkers = append(linkers, [2]string{fields[1], ""})
+				if checkrev {
+					linkers = append(linkers, [2]string{"", fields[1]})
+				}
 			}
 		}
 	}
