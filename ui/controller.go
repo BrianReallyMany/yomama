@@ -112,6 +112,7 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	errorsMap := make(map[string]int)
 
 	ch <- "Reading in sequences..."
+	seqcount := 0
 
 	for seqReader.HasNext() {
 		seq := seqReader.Next()
@@ -128,6 +129,10 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 		if err != nil {
 			ch <- "PrepFiles: error storing seq--"
 			ch <- sortedseq.ToString()
+		}
+		seqcount++
+		if seqcount % 1000 == 0 {
+			ch <- strconv.Itoa(seqcount) + " sequences processed ...\n"
 		}
 	}
 	ch <- "...done.\n"
