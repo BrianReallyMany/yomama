@@ -4,6 +4,7 @@ import (
     "bytes"
     "encoding/gob"
     . "github.com/BrianReallyMany/yomama/seq"
+    "github.com/BrianReallyMany/yomama/seq/sequtil"
     "math"
     "os"
 )
@@ -67,7 +68,9 @@ func (s *Store) AddSeq(seq Seq) error {
     // Split data into fixed-width strings
     headerLines := splitFixedWidth([]byte(seq.Header), storeLineWidth)
     basesLines := splitFixedWidth([]byte(seq.Bases), storeLineWidth)
-    scoresLines := splitFixedWidth([]byte(seq.Scores), storeLineWidth)
+    // Convert Scores from []int to string
+    scorestring := seq.ScoresToString()
+    scoresLines := splitFixedWidth([]byte(scorestring), storeLineWidth)
 
     // Add the store entry
     s.seqIndex[mySortKey] = append(s.seqIndex[mySortKey], storeEntry{s.lineCount, uint(len(headerLines)), uint(len(basesLines)), uint(len(scoresLines))})
@@ -143,7 +146,8 @@ func (s *Store) FetchSeqs(key SortKey) []Seq {
         // Construct the seq
         seqs[i].Header = string(bytes.Trim(header, " "))
         seqs[i].Bases = string(bytes.Trim(bases, " "))
-        seqs[i].Scores = string(bytes.Trim(scores, " "))
+	// scores is a []byte; Seq.Scores is a []int
+        seqs[i].Scores = sequtil.QualStringToIntSlice(string(scores))
         seqs[i].Sample = key.Sample
         seqs[i].Locus = key.Locus
         seqs[i].Reverse = false

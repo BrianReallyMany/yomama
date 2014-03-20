@@ -13,7 +13,7 @@ func TestStore_AddFetchSeq(t *testing.T) {
         t.Fail()
     }
 
-    testSeq1 := Seq{strings.Repeat("testSeq1", 100), "ATGC", "@#$%", "sample1", "locus1", false}
+    testSeq1 := Seq{strings.Repeat("testSeq1", 100), "ATGC", []int{25, 30, 30, 28}, "sample1", "locus1", false}
 
     // Add the seqs
     store.AddSeq(testSeq1)
@@ -25,8 +25,20 @@ func TestStore_AddFetchSeq(t *testing.T) {
         t.Fail()
     }
 
-    if seqs[0] != testSeq1 {
+    result := seqs[0]
+    if result.Bases != testSeq1.Bases {
         t.Fail()
+    }
+    for i, score := range testSeq1.Scores {
+	    if score != result.Scores[i] {
+		    t.Fail()
+	    }
+    }
+    if result.Locus != testSeq1.Locus {
+	    t.Fail()
+    }
+    if result.Sample != testSeq1.Sample {
+	    t.Fail()
     }
 
     // Cleanup after ourselves
