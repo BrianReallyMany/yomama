@@ -8,6 +8,10 @@ import (
 // Returns the number of mismatches between an oligo pair and a raw sequence
 // Second oligo string is reverse complemented before comparison
 func MatchBeginAndEnd(oligoseqs [2]string, rawseq string) int {
+	// Can't match if the sequence is too short
+	if len(oligoseqs[0]) + len(oligoseqs[1]) >= len(rawseq) {
+		return len(rawseq)
+	}
 	misses := 0
 	frontoligo := oligoseqs[0]
 	rearoligo := ReverseComplement(oligoseqs[1])
