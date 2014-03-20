@@ -98,3 +98,14 @@ func TestReverseComplementSeq(t *testing.T) {
 		t.Errorf("ReverseComplement('CAT') returned %s, expected 'ATG'", outseq)
 	}
 }
+
+func TestQualStringToIntSlice(t *testing.T) {
+	qualstring := "20 30 25 40"
+	intslice := QualStringToIntSlice(qualstring)
+	expected := []int{20, 30, 25, 40}
+	for i, score := range intslice {
+		if score != expected[i] {
+			t.Errorf("QualStringToIntSlice returned %d; expected %d", score, expected[i])
+		}
+	}
+}

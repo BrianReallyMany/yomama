@@ -1,5 +1,10 @@
 package sequtil
 
+import (
+	"strings"
+	"strconv"
+)
+
 // Returns the number of mismatches between an oligo pair and a raw sequence
 // Second oligo string is reverse complemented before comparison
 func MatchBeginAndEnd(oligoseqs [2]string, rawseq string) int {
@@ -82,3 +87,15 @@ func ReverseComplement(seq string) string {
 	return Complement(reversed)
 }
 
+func QualStringToIntSlice(quals string) []int {
+	splitquals := strings.Split(quals, " ")
+	scoreslice := make([]int, len(splitquals))
+	for i, score := range splitquals {
+		intscore, err := strconv.Atoi(score)
+		if err != nil {
+			return scoreslice
+		}
+		scoreslice[i] = intscore
+	}
+	return scoreslice
+}
