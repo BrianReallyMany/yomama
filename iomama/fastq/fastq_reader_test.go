@@ -3,6 +3,7 @@ package fastq
 import (
     "bufio"
     . "github.com/BrianReallyMany/yomama/seq"
+    "github.com/BrianReallyMany/yomama/seq/sequtil"
     "strings"
     "testing"
 )
@@ -16,18 +17,23 @@ func TestFastqReaderIteration(t *testing.T) {
                           seq Seq
                           pass bool
                       } {
-        {Seq{"seq1", "ATGCT", "#$%^&", "", "", false}, false},
-        {Seq{"seq2", "ATGCG", "&^%$#", "", "", false}, false},
-        {Seq{"seq3", "ATGCA", "ABCDE", "", "", false}, false},
+        {Seq{"seq1", "ATGCT", sequtil.StringToPhredScoreSlice("#$%^&", false), "", "", false}, false},
+        {Seq{"seq2", "ATGCG", sequtil.StringToPhredScoreSlice("&^%$#", false), "", "", false}, false},
+        {Seq{"seq3", "ATGCA", sequtil.StringToPhredScoreSlice("ABCDE", false), "", "", false}, false},
     }
 
     i := 0
     for fastqReader.HasNext() {
         seq := fastqReader.Next()
 
-        if seq == testSeqs[i].seq {
+        if seq.Bases == testSeqs[i].seq.Bases && seq.Header == testSeqs[i].seq.Header {
             testSeqs[i].pass = true
         }
+	for j, score := range seq.Scores {
+		if score != testSeqs[i].seq.Scores[j] {
+			testSeqs[i].pass = false
+		}
+	}
         i++
     }
 

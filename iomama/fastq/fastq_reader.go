@@ -4,6 +4,7 @@ import (
     "bufio"
     "bytes"
     . "github.com/BrianReallyMany/yomama/seq"
+    "github.com/BrianReallyMany/yomama/seq/sequtil"
     "io"
 )
 
@@ -56,5 +57,7 @@ func (f *FastqReader) HasNext() bool {
 
 // Gets the next index and sequence when iterating
 func (f *FastqReader) Next() Seq {
-    return Seq{string(f.next[0][1:]), string(f.next[1]), string(f.next[2]), "", "", false}
+	scorestring := string(f.next[2])
+	scores := sequtil.StringToPhredScoreSlice(scorestring, false)
+    return Seq{string(f.next[0][1:]), string(f.next[1]), scores, "", "", false}
 }
