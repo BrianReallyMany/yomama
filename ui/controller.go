@@ -2,6 +2,8 @@ package ui
 
 import (
 	"bufio"
+	"fmt"
+	"time"
 	"strconv"
 	"log"
 	"errors"
@@ -34,6 +36,8 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 		return
 	}
 
+	// TIME
+	t0 := time.Now()
 	myPath := args[0]
 
 	ch <- "\nVerifying files...\n"
@@ -103,16 +107,22 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 	}
 
 	// Make Store
-	store, err := sortseq.NewStore(myPath + "/yomama.store")
-	if err != nil {
-		return
-	}
+	//store, err := sortseq.NewStore(myPath + "/yomama.store")
+	//if err != nil {
+	//	return
+	//}
 
 	// Track where sorting fails and why
 	errorsMap := make(map[string]int)
 
+	t1 := time.Now()
+	ch <- fmt.Sprintf("That took %v to run.", t1.Sub(t0))
+
 	ch <- "Reading in sequences..."
 	seqcount := 0
+
+	loopStartTime := time.Now()
+	lastThousandTime := time.Now()
 
 	for seqReader.HasNext() {
 		seq := seqReader.Next()
@@ -123,16 +133,28 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 			if e, ok := err.(*sortseq.SeqSorterError); ok {
 				errorsMap[e.Where] += 1
 			}
+			seqcount++
+			if seqcount % 1000 == 0 {
+				ch <- fmt.Sprintf("%d sequences processed ...", seqcount)
+				ch <- fmt.Sprintf("Last 1000 sequences took %v to process", time.Now().Sub(lastThousandTime))
+				ch <- fmt.Sprintf("So far we've processed %d sequences in %v\n", seqcount, time.Now().Sub(loopStartTime))
+				lastThousandTime = time.Now()
+			}
 			continue
 		}
-		err = store.AddSeq(sortedseq)
-		if err != nil {
-			ch <- "PrepFiles: error storing seq--"
-			ch <- sortedseq.ToString()
-		}
+		// TODO this is here so compile.
+		sortedseq.Bases = "FOO"
+		//err = store.AddSeq(sortedseq)
+		//if err != nil {
+			//ch <- "PrepFiles: error storing seq--"
+			//ch <- sortedseq.ToString()
+		//}
 		seqcount++
 		if seqcount % 1000 == 0 {
-			ch <- strconv.Itoa(seqcount) + " sequences processed ...\n"
+			ch <- strconv.Itoa(seqcount) + " sequences processed ..."
+			ch <- fmt.Sprintf("Last 1000 sequences took %v to process", time.Now().Sub(lastThousandTime))
+			ch <- fmt.Sprintf("So far we've processed %d sequences in %v\n", seqcount, time.Now().Sub(loopStartTime))
+			lastThousandTime = time.Now()
 		}
 	}
 	ch <- "...done.\n"
