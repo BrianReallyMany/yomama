@@ -35,12 +35,36 @@ func TestMatchBeginAndEndTrue(t *testing.T) {
 	}
 }
 
+func BenchmarkMatchBeginAndEnd(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		oligos := [2]string{"ACTACTATGT", ""}
+		rawseq := "ACTACTATGTCGTAGACTAGTACGGTAGCAGAGACTTGGTCTCGCCACAACGCAACAAAGCAGACACTTTACAGCAACAAGAAGGCAAAGCAAGATGAAATGAAAAATGTCTACGCATACATACATACATACATACATACATAAGTAAACATAGTAATAAACCGTAAATGGTTGTGTGTATGTGCTGTAGAACCATGTCGTCAGTGT"
+		MatchBeginAndEnd(oligos, rawseq)
+	}
+}
+
 func TestNumberMismatches(t *testing.T) {
 	seq1 := "GGG"
 	seq2 := "GGA"
 	mismatches := NumberMismatches(seq1, seq2)
 	if (mismatches != 1) {
 		t.Errorf("NumberMismatches(%s, %s) returned %d, want 1", seq1, seq2, mismatches)
+	}
+}
+
+func BenchmarkNumberMismatches(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		seq1 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
+		seq2 := "AGTACCGCTCTGTTCTAACCCTAAAACGATGCCCGGCTGCAATTTGTGGTGTA"
+		NumberMismatches(seq1, seq2)
+	}
+}
+
+func BenchmarkNumberMismatchesNoDifferences(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		seq1 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
+		seq2 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
+		NumberMismatches(seq1, seq2)
 	}
 }
 

@@ -43,3 +43,9 @@ func TestMatchBaseatoATrue(t *testing.T) {
 		t.Errorf("MatchBase('a', 'A') returned false.")
 	}
 }
+
+func BenchmarkMatchBase(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		MatchBase("A", "C")
+	}
+}

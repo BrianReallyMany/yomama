@@ -126,10 +126,10 @@ func (c *MamaController) PrepFiles(args []string, ch chan string) {
 
 	for seqReader.HasNext() {
 		seq := seqReader.Next()
-		beforeSort := time.Now()
+		//beforeSort := time.Now()
 		sortedseq, err := sorter.SortSeq(seq)
-		afterSort := time.Now()
-		ch <- fmt.Sprintf("SortSeq took %v to run", afterSort.Sub(beforeSort))
+		//afterSort := time.Now()
+		//ch <- fmt.Sprintf("SortSeq took %v to run", afterSort.Sub(beforeSort))
 		if err != nil {
 			// Add entry to errorsMap
 			// (required type assertion)
