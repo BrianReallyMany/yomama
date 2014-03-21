@@ -27,7 +27,7 @@ func (s *Seq) ToString() string {
 
 func (s *Seq) TrimEnds(fromBegin, fromEnd int) error {
 	// Check for error
-	if len(s.Bases) < fromBegin + fromEnd {
+	if len(s.Bases) < fromBegin + fromEnd || len(s.Scores) < fromBegin + fromEnd {
 		return errors.New("TrimEnds called on seq that is too short")
 	}
 	// Trim Bases

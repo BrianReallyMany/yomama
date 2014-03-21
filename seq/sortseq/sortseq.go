@@ -137,6 +137,7 @@ func (s *SeqSorter) ToString() string {
 }
 
 func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
+	fmt.Println(seq.ToString())
 	// TODO be flexible; if seq already has sample, skip debarcoding...
 	// Find barcode pair with best match
 	barcodeKeys := getSliceOfKeys(s.barcodeMap)
