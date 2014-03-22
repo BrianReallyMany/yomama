@@ -1,6 +1,9 @@
 package sequtil
 
-import "testing"
+import (
+	"testing"
+	"bytes"
+)
 
 func makeTestMap() map[[2]string]string {
 	m := make(map[[2]string]string)
@@ -44,8 +47,8 @@ func BenchmarkMatchBeginAndEnd(b *testing.B) {
 }
 
 func TestNumberMismatches(t *testing.T) {
-	seq1 := "GGG"
-	seq2 := "GGA"
+	seq1 := []byte("ggg")
+	seq2 := []byte("gga")
 	mismatches := NumberMismatches(seq1, seq2)
 	if (mismatches != 1) {
 		t.Errorf("NumberMismatches(%s, %s) returned %d, want 1", seq1, seq2, mismatches)
@@ -54,23 +57,23 @@ func TestNumberMismatches(t *testing.T) {
 
 func BenchmarkNumberMismatches(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		seq1 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
-		seq2 := "AGTACCGCTCTGTTCTAACCCTAAAACGATGCCCGGCTGCAATTTGTGGTGTA"
+		seq1 := bytes.ToLower([]byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"))
+		seq2 := bytes.ToLower([]byte("AGTACCGCTCTGTTCTAACCCTAAAACGATGCCCGGCTGCAATTTGTGGTGTA"))
 		NumberMismatches(seq1, seq2)
 	}
 }
 
 func BenchmarkNumberMismatchesNoDifferences(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		seq1 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
-		seq2 := "AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"
+		seq1 := []byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA")
+		seq2 := []byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA")
 		NumberMismatches(seq1, seq2)
 	}
 }
 
 func TestNumberMismatchesZero(t *testing.T) {
-	seq1 := "GGA"
-	seq2 := "GGA"
+	seq1 := []byte("gga")
+	seq2 := []byte("gga")
 	mismatches := NumberMismatches(seq1, seq2)
 	if (mismatches != 0) {
 		t.Errorf("NumberMismatches(%s, %s) returned %d, want 0", seq1, seq2, mismatches)
@@ -78,8 +81,8 @@ func TestNumberMismatchesZero(t *testing.T) {
 }
 
 func TestNumberMismatchesOligoStringEmpty(t *testing.T) {
-	oligo := ""
-	raw := "GGG"
+	oligo := []byte("")
+	raw := []byte("ggg")
 	mismatches := NumberMismatches(oligo, raw)
 	if mismatches != 0 {
 		t.Errorf("NumberMismatches('', 'GGG') returned %s, want 0", mismatches)
@@ -87,8 +90,8 @@ func TestNumberMismatchesOligoStringEmpty(t *testing.T) {
 }
 
 func TestNumberMismatchesUnequalLengths(t *testing.T) {
-	seq1 := "GGGCC"
-	seq2 := "GGA"
+	seq1 := []byte("gggcc")
+	seq2 := []byte("gga")
 	mismatches := NumberMismatches(seq1, seq2)
 	if (mismatches != 3) {
 		t.Errorf("NumberMismatches(%s, %s) returned %d, want 3", seq1, seq2, mismatches)
