@@ -31,10 +31,10 @@ func TestMakeTestMap(t *testing.T) {
 func TestMatchBeginAndEndTrue(t *testing.T) {
 	testraw := "GATTACA"
 	testoligos := [2]string{"GAT", "TGT"}
-	mismatches := MatchBeginAndEnd(testoligos, testraw)
+	mismatches := MatchBeginAndEnd(testoligos, testraw, 8)
 	expected := 0
 	if (mismatches != expected) {
-		t.Errorf("MatchBeginAndEnd(%s, %s) = %d, want %d", testoligos, testraw, mismatches, expected)
+		t.Errorf("MatchBeginAndEnd(%s, %s, 8) = %d, want %d", testoligos, testraw, mismatches, expected)
 	}
 }
 
@@ -42,16 +42,16 @@ func BenchmarkMatchBeginAndEnd(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		oligos := [2]string{"ACTACTATGT", ""}
 		rawseq := "ACTACTATGTCGTAGACTAGTACGGTAGCAGAGACTTGGTCTCGCCACAACGCAACAAAGCAGACACTTTACAGCAACAAGAAGGCAAAGCAAGATGAAATGAAAAATGTCTACGCATACATACATACATACATACATACATAAGTAAACATAGTAATAAACCGTAAATGGTTGTGTGTATGTGCTGTAGAACCATGTCGTCAGTGT"
-		MatchBeginAndEnd(oligos, rawseq)
+		MatchBeginAndEnd(oligos, rawseq, 20)
 	}
 }
 
 func TestNumberMismatches(t *testing.T) {
 	seq1 := []byte("ggg")
 	seq2 := []byte("gga")
-	mismatches := NumberMismatches(seq1, seq2)
+	mismatches := NumberMismatches(seq1, seq2, 4)
 	if (mismatches != 1) {
-		t.Errorf("NumberMismatches(%s, %s) returned %d, want 1", seq1, seq2, mismatches)
+		t.Errorf("NumberMismatches(%s, %s, 4) returned %d, want 1", seq1, seq2, mismatches)
 	}
 }
 
@@ -59,7 +59,7 @@ func BenchmarkNumberMismatches(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		seq1 := bytes.ToLower([]byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA"))
 		seq2 := bytes.ToLower([]byte("AGTACCGCTCTGTTCTAACCCTAAAACGATGCCCGGCTGCAATTTGTGGTGTA"))
-		NumberMismatches(seq1, seq2)
+		NumberMismatches(seq1, seq2, 100)
 	}
 }
 
@@ -67,34 +67,43 @@ func BenchmarkNumberMismatchesNoDifferences(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		seq1 := []byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA")
 		seq2 := []byte("AGTACCGCCCTGTTCTAACCCTTAAACGATGCCCAGCTGCAATTTGGGGTGTA")
-		NumberMismatches(seq1, seq2)
+		NumberMismatches(seq1, seq2, 100)
 	}
 }
 
 func TestNumberMismatchesZero(t *testing.T) {
 	seq1 := []byte("gga")
 	seq2 := []byte("gga")
-	mismatches := NumberMismatches(seq1, seq2)
+	mismatches := NumberMismatches(seq1, seq2, 4)
 	if (mismatches != 0) {
-		t.Errorf("NumberMismatches(%s, %s) returned %d, want 0", seq1, seq2, mismatches)
+		t.Errorf("NumberMismatches(%s, %s, 4) returned %d, want 0", seq1, seq2, mismatches)
 	}
 }
 
 func TestNumberMismatchesOligoStringEmpty(t *testing.T) {
 	oligo := []byte("")
 	raw := []byte("ggg")
-	mismatches := NumberMismatches(oligo, raw)
+	mismatches := NumberMismatches(oligo, raw, 4)
 	if mismatches != 0 {
-		t.Errorf("NumberMismatches('', 'GGG') returned %s, want 0", mismatches)
+		t.Errorf("NumberMismatches('', 'GGG', 4) returned %s, want 0", mismatches)
 	}
 }
 
 func TestNumberMismatchesUnequalLengths(t *testing.T) {
 	seq1 := []byte("gggcc")
 	seq2 := []byte("gga")
-	mismatches := NumberMismatches(seq1, seq2)
+	mismatches := NumberMismatches(seq1, seq2, 6)
 	if (mismatches != 3) {
-		t.Errorf("NumberMismatches(%s, %s) returned %d, want 3", seq1, seq2, mismatches)
+		t.Errorf("NumberMismatches(%s, %s, 6) returned %d, want 3", seq1, seq2, mismatches)
+	}
+}
+
+func TestNumberMismatchesExceedsMax(t *testing.T) {
+	seq1 := []byte("gggcc")
+	seq2 := []byte("ggaaa")
+	mismatches := NumberMismatches(seq1, seq2, 1)
+	if (mismatches != 1) {
+		t.Errorf("NumberMismatches(%s, %s, 1) returned %d, want 1", seq1, seq2, mismatches)
 	}
 }
 

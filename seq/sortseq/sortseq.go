@@ -140,7 +140,7 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	// TODO be flexible; if seq already has sample, skip debarcoding...
 	// Find barcode pair with best match
 	barcodeKeys := getSliceOfKeys(s.barcodeMap)
-	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases)
+	bestBarcodes, mismatches := bestMatch(barcodeKeys, seq.Bases, s.bdiffs+1)
 	// Verify acceptable number of mismatches
 	if mismatches > s.bdiffs {
 		return seq, &SeqSorterError{"Exceeded maximum number of differences between barcode and sequence", "barcode"}
@@ -159,7 +159,7 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 	// TODO flag for "check reversed linker/primer pairs"?
 
 	// Find linker pair with best match
-	bestLinkers, mismatches := bestMatch(s.linkers, seq.Bases)
+	bestLinkers, mismatches := bestMatch(s.linkers, seq.Bases, s.ldiffs+1)
 	if mismatches > s.ldiffs {
 		return seq, &SeqSorterError{"Exceeded maximum number of differences between linker and sequence", "linker"}
 	}
@@ -171,7 +171,7 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 
 	// Find primer pair with best match
 	primerKeys := getSliceOfKeys(s.primerMap)
-	bestPrimers, mismatches := bestMatch(primerKeys, seq.Bases)
+	bestPrimers, mismatches := bestMatch(primerKeys, seq.Bases, s.pdiffs+1)
 	if mismatches > s.pdiffs {
 		return seq, &SeqSorterError{"Exceeded maximum number of differences between primer and sequence", "primer"}
 	}
@@ -193,11 +193,11 @@ func (s *SeqSorter) SortSeq(seq Seq) (Seq, error) {
 
 // From a list of barcode pairs, return the pair that matches
 // most closely, and the number of bases that don't match
-func bestMatch(oligos [][2]string, seq string) ([2]string, int) {
+func bestMatch(oligos [][2]string, seq string, maxDiffs int) ([2]string, int) {
 	winner := [2]string{"", ""}
 	mismatches := len(seq) + 1
 	for _, pair := range oligos {
-		if misses := sequtil.MatchBeginAndEnd(pair, seq); misses < mismatches {
+		if misses := sequtil.MatchBeginAndEnd(pair, seq, maxDiffs); misses < mismatches {
 			mismatches = misses
 			winner = pair
 		}

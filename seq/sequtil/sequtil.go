@@ -8,7 +8,7 @@ import (
 
 // Returns the number of mismatches between an oligo pair and a raw sequence
 // Second oligo string is reverse complemented before comparison
-func MatchBeginAndEnd(oligoseqs [2]string, rawseq string) int {
+func MatchBeginAndEnd(oligoseqs [2]string, rawseq string, maxMismatches int) int {
 	// Can't match if the sequence is too short
 	if len(oligoseqs[0]) + len(oligoseqs[1]) >= len(rawseq) {
 		return len(rawseq)
@@ -20,12 +20,15 @@ func MatchBeginAndEnd(oligoseqs [2]string, rawseq string) int {
 	endraw := []byte(rawseq[len(rawseq) - len(rearoligo):])
 	// Note that it is required to pass the arguments to
 	// NumberMismatches in this order
-	misses += NumberMismatches(bytes.ToLower(frontoligo), bytes.ToLower(beginraw))
-	misses += NumberMismatches(bytes.ToLower(rearoligo), bytes.ToLower(endraw))
+	misses += NumberMismatches(bytes.ToLower(frontoligo), bytes.ToLower(beginraw), maxMismatches)
+	if misses >= maxMismatches {
+		return maxMismatches
+	}
+	misses += NumberMismatches(bytes.ToLower(rearoligo), bytes.ToLower(endraw), maxMismatches-misses)
 	return misses
 }
 
-func NumberMismatches(oligoseq, rawseq []byte) int {
+func NumberMismatches(oligoseq, rawseq []byte, maxMismatches int) int {
 	count := 0
 	len1 := len(oligoseq)
 	len2 := len(rawseq)
@@ -46,11 +49,18 @@ func NumberMismatches(oligoseq, rawseq []byte) int {
 		}
 	}
 
+	if count >= maxMismatches {
+		return maxMismatches
+	}
+
 	for i := 0; i < shorterLen; i++ {
 		// Note that it is required to provide the arguments to MatchBase
 		// in this order.
 		if !MatchBase(oligoseq[i], rawseq[i]) {
 			count++
+			if count >= maxMismatches {
+				return maxMismatches
+			}
 		}
 	}
 	return count
