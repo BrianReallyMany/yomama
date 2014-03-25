@@ -20,7 +20,7 @@ func TestOptionsRead(t *testing.T) {
 
 	options := NewOptions(&test)
 
-	buffer := bytes.NewBufferString("Num=42\nStr=Hello, world!\nDog=yo man\n")
+	buffer := bytes.NewBufferString("Num =  42\nStr =Hello, world!\nDog=yo man\n")
 	options.Read(buffer)
 
 	if test.Num != 42 {
