@@ -1,9 +1,13 @@
 package options
 
 import (
+	"bufio"
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"reflect"
+	"strconv"
 )
 
 type Options struct {
@@ -18,6 +22,111 @@ func NewOptions(optionsStruct interface{}) *Options {
 	mapFieldRecursive(&options.fields, "options", reflect.ValueOf(optionsStruct).Elem())
 
 	return options
+}
+
+func (o *Options) Read(r io.Reader) error {
+	scanner := bufio.NewScanner(r)
+
+	lineNum := 0
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		splitLine := bytes.Split(line, []byte{'='})
+
+		if len(splitLine) != 2 {
+			return errors.New("Line "+strconv.Itoa(lineNum)+" has invalid syntax:"+string(line))
+		}
+
+		name := string(splitLine[0])
+		value := string(splitLine[1])
+		kind := o.fields[name].Kind()
+
+		switch kind {
+		case reflect.Bool:
+			if val, err := strconv.ParseBool(value); err == nil {
+				o.fields[name].SetBool(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.String:
+			o.fields[name].SetString(value)
+			break
+		case reflect.Int:
+			if val, err := strconv.ParseInt(value, 10, 32); err == nil {
+				o.fields[name].SetInt(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Int8:
+			if val, err := strconv.ParseInt(value, 10, 8); err == nil {
+				o.fields[name].SetInt(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Int16:
+			if val, err := strconv.ParseInt(value, 10, 16); err == nil {
+				o.fields[name].SetInt(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Int32:
+			if val, err := strconv.ParseInt(value, 10, 32); err == nil {
+				o.fields[name].SetInt(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Int64:
+			if val, err := strconv.ParseInt(value, 10, 64); err == nil {
+				o.fields[name].SetInt(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Uint:
+			if val, err := strconv.ParseUint(value, 10, 32); err == nil {
+				o.fields[name].SetUint(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Uint8:
+			if val, err := strconv.ParseUint(value, 10, 8); err == nil {
+				o.fields[name].SetUint(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Uint16:
+			if val, err := strconv.ParseUint(value, 10, 16); err == nil {
+				o.fields[name].SetUint(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Uint32:
+			if val, err := strconv.ParseUint(value, 10, 32); err == nil {
+				o.fields[name].SetUint(val)
+			} else {
+				return err
+			}
+			break
+		case reflect.Uint64:
+			if val, err := strconv.ParseUint(value, 10, 64); err == nil {
+				o.fields[name].SetUint(val)
+			} else {
+				return err
+			}
+			break
+		}
+
+		lineNum++
+	}
+
+	return nil
 }
 
 func (o *Options) Write(w io.Writer) {
