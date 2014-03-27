@@ -9,5 +9,7 @@ import (
 func main() {
 	console := ui.MakeMamaConsole()
 
-	cmd.DoConsole(console, os.Stdin)
+	doer := cmd.NewConsoleDoer(console, os.Stdin, os.Stdout)
+
+	doer.Run()
 }

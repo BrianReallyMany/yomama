@@ -29,6 +29,10 @@ func (c *MamaConsole) Help() string {
 	return "Available commands: echo, system, exit"
 }
 
+func (c *MamaConsole) Echo_help() string {
+	return "Usage: echo <text>\nPrints supplied text to standard out\n"
+}
+
 // Execute some yomama commands
 func (c *MamaConsole) Execute(cmd string, args []string, line []byte) bool {
 	switch cmd {
