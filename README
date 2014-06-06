@@ -1,4 +1,6 @@
-yomama is a console-based application for preparing and processing sequencing data.
+yomama is a console-based application for preparing and processing sequencing data from multiplexed amplicon datasets.  
+These datasets contain seqeuncing from multiple amplicons across many individual samples barcoded into a run of MiSeq, PGM, or other instrument. 
+This woudld be data produced by Fluidigm Access Array, Ampliseq, Trueseq amplicon seqeuncing, or any other technology that generates amplicon data.
 
 Preparing includes reading fastq or fasta/qual files, debarcoding, delinkering, deprimering and quality filtering.
 
